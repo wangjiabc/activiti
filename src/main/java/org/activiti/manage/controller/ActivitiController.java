@@ -516,19 +516,6 @@ public class ActivitiController {
          return "error";
      }
 
- 	/**启动流程实例**/
-     @RequestMapping(value = "/start")
-     public @ResponseBody Map startProcessInstance(@RequestParam String processDefinitionKey){
- 		//流程定义的key
- 		ProcessInstance pi = processEngineFactory.getRuntimeService()//与正在执行	的流程实例和执行对象相关的Service
- 						.startProcessInstanceByKey(processDefinitionKey);  //使用流程定义的key启动流程实例,key对应helloworld.bpmn文件中id的属性值，使用key值启动，默认是按照最新版本的流程定义启动
- 		Map map=new HashMap<>();
- 		map.put("流程实例ID:",pi.getId());//流程实例ID   101
- 		map.put("流程定义ID:",pi.getProcessDefinitionId());//流程定义ID
- 		return map;
- 	}
-    
-
  	/**查询当前人的个人任务*/
      @RequestMapping(value = "/findMyTask")
      public @ResponseBody List findMyPersonalTask(@RequestParam String assignee){
@@ -554,6 +541,27 @@ public class ActivitiController {
  			list2.add(map);
  		}
  		return list2;
+ 	}
+     
+     
+  	/**启动流程实例**/
+     @RequestMapping(value = "/start")
+     public @ResponseBody Map startProcessInstance(@RequestParam String processDefinitionKey,Integer days){
+ 		//流程定义的key
+    	 Map<String, Object> variables = new HashMap<String, Object>();
+     	
+     	variables.put("entity", days); 
+    	 
+ 		ProcessInstance pi = processEngineFactory.getRuntimeService()//与正在执行	的流程实例和执行对象相关的Service
+ 						.startProcessInstanceByKey(processDefinitionKey,variables);  //使用流程定义的key启动流程实例,key对应helloworld.bpmn文件中id的属性值，使用key值启动，默认是按照最新版本的流程定义启动
+ 		
+ 		processEngineFactory.getFormService().getRenderedStartForm(pi.getProcessDefinitionId());
+ 		
+ 		Map map=new HashMap<>();
+ 		map.put("流程实例ID:",pi.getId());//流程实例ID   101
+ 		map.put("流程定义ID:",pi.getProcessDefinitionId());//流程定义ID
+ 		
+ 		return map;
  	}
      
      /**完成我的任务*/
