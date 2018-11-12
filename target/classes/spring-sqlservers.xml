@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:aop="http://www.springframework.org/schema/aop" xmlns:task="http://www.springframework.org/schema/task"
+	xsi:schemaLocation="
+http://www.springframework.org/schema/beans 
+http://www.springframework.org/schema/beans/spring-beans-4.0.xsd 
+http://www.springframework.org/schema/tx 
+http://www.springframework.org/schema/tx/spring-tx-4.0.xsd
+http://www.springframework.org/schema/aop 
+http://www.springframework.org/schema/aop/spring-aop-4.0.xsd
+http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task-4.0.xsd
+http://www.springframework.org/schema/context  
+                http://www.springframework.org/schema/context/spring-context-4.0.xsd
+">
+
+<bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+    	<property name="location" value="classpath:jdbc.properties" />
+    </bean>
+    
+   <!-- DriverManagerDataSource建立连接是只要有连接就新建一个connection,根本没有连接池的作用 --> 
+   <!-- 
+      <bean id = "dataSourceSqlServers"
+         class = "org.springframework.jdbc.datasource.DriverManagerDataSource">
+       <property name = "driverClassName" value = "${driverClassName}" />
+       <property name = "url" value = "${url}" />
+       <property name = "username" value = "${username}" />
+       <property name = "password" value = "${password}" />
+       </bean>
+   -->
+
+   <bean name="dataSourceSqlServers" class="com.alibaba.druid.pool.DruidDataSource"
+		init-method="init" destroy-method="close">
+        <property name = "driverClassName" value = "${driverClassName}" />
+        <property name = "url" value = "${url}" />
+        <property name = "username" value = "${username}" />
+        <property name = "password" value = "${password}" />
+        <property name="maxActive"> 
+             <value>255</value> 
+         </property> 
+         <property name="maxIdle"> 
+                 <value>2</value> 
+         </property> 
+         <property name="maxWait"> 
+                 <value>120000</value> 
+        </property> 
+   </bean> 
+   
+   <bean id="jdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
+   <property name="dataSource">
+     <ref bean="dataSourceSqlServers" />
+   </property>
+  </bean>
+  
+  <bean id="dao" class="org.activiti.manage.daoImpl.UserDAOImpl">
+        <property name="jdbcTemplate" ref="jdbcTemplate"></property>
+   </bean> 
+
+  
+   <!-- 配置事务管理器 -->
+	<bean id="transactionManager"
+		class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource">
+           <ref bean="dataSourceSqlServers" />
+        </property>
+	</bean>
+
+	<!-- 注解方式配置事物 -->
+	<!-- <tx:annotation-driven transaction-manager="transactionManager" proxy-target-class="true"/> -->
+
+	<!-- 拦截器方式配置事物 -->
+	<tx:advice id="transactionAdvice" transaction-manager="transactionManager">
+		<tx:attributes>
+			<tx:method name="add*" propagation="REQUIRED" />
+			<tx:method name="append*" propagation="REQUIRED" />
+			<tx:method name="insert*" propagation="REQUIRED" />
+			<tx:method name="save*" propagation="REQUIRED" />
+			<tx:method name="update*" propagation="REQUIRED" />
+			<tx:method name="modify*" propagation="REQUIRED" />
+			<tx:method name="edit*" propagation="REQUIRED" />
+			<tx:method name="delete*" propagation="REQUIRED" />
+			<tx:method name="remove*" propagation="REQUIRED" />
+			<tx:method name="repair" propagation="REQUIRED" />
+			<tx:method name="delAndRepair" propagation="REQUIRED" />
+
+			<tx:method name="get*" propagation="SUPPORTS" />
+			<tx:method name="find*" propagation="SUPPORTS" />
+			<tx:method name="load*" propagation="SUPPORTS" />
+			<tx:method name="search*" propagation="SUPPORTS" />
+			<tx:method name="datagrid*" propagation="SUPPORTS" />
+
+			<tx:method name="*" propagation="SUPPORTS" />
+		</tx:attributes>
+	</tx:advice>
+	<aop:config>
+		<aop:pointcut id="transactionPointcut"
+			expression="execution(* org.activiti.manage.daoImpl..*.*(..))" />
+		<aop:advisor pointcut-ref="transactionPointcut"
+			advice-ref="transactionAdvice" />
+	</aop:config>
+   
+  
+</beans>
