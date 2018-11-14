@@ -42,8 +42,10 @@ import org.activiti.engine.repository.Model;
 import org.activiti.engine.repository.ProcessDefinition;
 import org.activiti.engine.runtime.ProcessInstance;
 import org.activiti.engine.task.Task;
+import org.activiti.manage.entity.Vacation;
 import org.activiti.manage.mapper.ReDeploymentMapper;
 import org.activiti.manage.model.ProcdefEntity;
+import org.activiti.manage.oa.dao.IBaseDao;
 import org.activiti.manage.tools.MyTestUtil;
 
 import org.activiti.spring.SpringProcessEngineConfiguration;
@@ -89,6 +91,9 @@ public class ActivitiController {
    @Autowired
    ReDeploymentMapper reDeploymentMapper;
     
+   @Autowired
+   private IBaseDao baseDao;
+   
     /** 
      * 查询生日列表 
      *  
@@ -342,7 +347,7 @@ public class ActivitiController {
 					//runtimeService.suspendProcessInstanceById(processInstanceId); //冻结
 					runtimeService.deleteProcessInstance(processInstanceId, "");
 					processEngineFactory.getTaskService().deleteTask(processInstanceId);
-				}catch (Exception e) {
+				}catch (org.activiti.engine.ActivitiException e) {
 					// TODO: handle exception
 					e.printStackTrace();
 					
@@ -516,7 +521,49 @@ public class ActivitiController {
          return "error";
      }
 
- 	/**查询当前人的个人任务*/
+  	/**启动流程实例**/
+     @RequestMapping(value = "/start")
+     public @ResponseBody Map startProcessInstance(@RequestParam String processDefinitionKey,Integer days){
+ 		//流程定义的key
+    	 Map<String, Object> variables = new HashMap<String, Object>();
+     	
+    	 Vacation vacation=new Vacation();
+    	 
+    	 
+    	ProcessInstance pi = processEngineFactory.getRuntimeService()//与正在执行	的流程实例和执行对象相关的Service
+						.startProcessInstanceByKey(processDefinitionKey);  //使用流程定义的key启动流程实例,key对应helloworld.bpmn文件中id的属性值，使用key值启动，默认是按照最新版本的流程定义启动
+
+    	 vacation.setDays(days);
+    	 vacation.setId(Integer.parseInt(pi.getId()));
+    	 
+     	variables.put("entity", days); 
+     	variables.put("entity2", vacation); 
+     	variables.put("entity3", 7); 
+     	
+     	Map map=new HashMap<>();
+ 
+     	try {
+			baseDao.add(vacation);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+	     	runtimeService.deleteProcessInstance(pi.getId(), "");
+			processEngineFactory.getTaskService().deleteTask(pi.getId());
+			processEngineFactory.getTaskService().deleteTask(pi.getId());
+			map.put("error:","false");//流程实例ID   101
+			return map;
+		}
+     	
+ 	
+ 		
+ 		
+ 		map.put("流程实例ID:",pi.getId());//流程实例ID   101
+ 		map.put("流程定义ID:",pi.getProcessDefinitionId());//流程定义ID
+ 		
+ 		return map;
+ 	}
+     
+  	/**查询当前人的个人任务*/
      @RequestMapping(value = "/findMyTask")
      public @ResponseBody List findMyPersonalTask(@RequestParam String assignee){
  		 List<Task> list = processEngineFactory.getTaskService()//与正在执行的任务管理相关的Service
@@ -540,28 +587,45 @@ public class ActivitiController {
  			
  			list2.add(map);
  		}
+ 		
+ 		//list2=getBaseVOList(list);
+ 		
  		return list2;
  	}
      
      
-  	/**启动流程实例**/
-     @RequestMapping(value = "/start")
-     public @ResponseBody Map startProcessInstance(@RequestParam String processDefinitionKey,Integer days){
- 		//流程定义的key
-    	 Map<String, Object> variables = new HashMap<String, Object>();
-     	
-     	variables.put("entity", days); 
+     protected List getBaseVOList(List<Task> tasks) {
+     	List taskList = new ArrayList();
+         for (Task task : tasks) {
+         	String processInstanceId = task.getProcessInstanceId();
+             ProcessInstance processInstance = this.runtimeService.createProcessInstanceQuery().processInstanceId(processInstanceId).active().singleResult();
+
+             //获取当前流程下的key为entity的variable
+             Object base =  this.runtimeService.getVariable(processInstance.getId(), "entity");
+             taskList.add(base);
+         }
+     	return taskList;
+     }
+     
+     /**查询当前任务*/
+     @RequestMapping(value = "/findMyTaskById")
+     public @ResponseBody String findMyPersonalTaskById(@RequestParam String id){
     	 
- 		ProcessInstance pi = processEngineFactory.getRuntimeService()//与正在执行	的流程实例和执行对象相关的Service
- 						.startProcessInstanceByKey(processDefinitionKey,variables);  //使用流程定义的key启动流程实例,key对应helloworld.bpmn文件中id的属性值，使用key值启动，默认是按照最新版本的流程定义启动
- 		
- 		processEngineFactory.getFormService().getRenderedStartForm(pi.getProcessDefinitionId());
- 		
- 		Map map=new HashMap<>();
- 		map.put("流程实例ID:",pi.getId());//流程实例ID   101
- 		map.put("流程定义ID:",pi.getProcessDefinitionId());//流程定义ID
- 		
- 		return map;
+    	 Object object=processEngineFactory.getRuntimeService().getVariable(id, "loanRequest");
+    	 
+    	 MyTestUtil.print(object);
+    	 /*
+    	 List list2 = new ArrayList<>();
+    	 
+    	 Iterator iterator=list.iterator();
+  		
+    	 while (iterator.hasNext()) {
+ 			
+  			list2.add(iterator.next());
+  		}
+    	 */
+    	 return "";
+    	
  	}
      
      /**完成我的任务*/

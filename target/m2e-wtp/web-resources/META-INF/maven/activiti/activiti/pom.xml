@@ -67,6 +67,11 @@
             <artifactId>spring-orm</artifactId>  
             <version>4.3.10.RELEASE</version>  
         </dependency>  
+        <dependency>  
+            <groupId>org.springframework</groupId>  
+            <artifactId>spring-test</artifactId>  
+            <version>4.3.10.RELEASE</version>  
+        </dependency>
         <!-- servlet API -->  
         <dependency>  
             <groupId>javax.servlet</groupId>  
@@ -283,6 +288,13 @@
     <artifactId>activiti-simple-workflow</artifactId>
     <version>5.22.0</version>
 </dependency>
+
+	<!-- https://mvnrepository.com/artifact/org.hibernate/hibernate-core -->
+	<dependency>
+		<groupId>org.hibernate</groupId>
+		<artifactId>hibernate-core</artifactId>
+		<version>4.3.11.Final</version>
+	</dependency>
 	    
 	     <!-- https://mvnrepository.com/artifact/org.hibernate/hibernate-entitymanager -->
 	<dependency>
@@ -291,12 +303,6 @@
     	<version>4.3.11.Final</version>
 	</dependency>
 	    
-	    <dependency>
-      		<groupId>org.hibernate</groupId>
-      		<artifactId>hibernate-entitymanager</artifactId>
-      		<optional>true</optional>
-      		<version>4.3.11.Final</version>
-    	</dependency>
 	   
 	   <!-- https://mvnrepository.com/artifact/de.odysseus.juel/juel -->
 <dependency>

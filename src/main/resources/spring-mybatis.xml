@@ -64,10 +64,43 @@ http://www.springframework.org/schema/task http://www.springframework.org/schema
 		<property name="sqlSessionFactoryBeanName" value="sqlSessionFactory" />
 	</bean>
 
+	<bean id="sessionFactory" class="org.springframework.orm.hibernate4.LocalSessionFactoryBean"> 
+        <property name="dataSource" ref="dataSourceMybatis" /> 
+		<property name="packagesToScan" value="org.activiti.manage.entity,org.activiti.manage.jpa">
+		</property>
+        <property name="hibernateProperties"> 
+         	<props>
+		         <prop key="hibernate.show_sql">true</prop>
+		         <prop key="hibernate.format_sql">true</prop>
+		         <prop key="hibernate.dialect">org.hibernate.dialect.MySQLDialect</prop>
+		 	 <prop key="hibernate.hbm2ddl.auto">update</prop> 
+  			</props>
+        </property> 
+    </bean>   
+
+	<!-- 配置Spring的声明式事务 -->
+        <!-- 1.配置事务管理器 -->
+        <bean id="transactionManager2" class="org.springframework.orm.hibernate4.HibernateTransactionManager">
+            <property name="sessionFactory" ref="sessionFactory"></property>
+        </bean>
+        <!-- 2.配置事务属性,需要事务管理器 -->
+        <tx:advice id="txAdvice" transaction-manager="transactionManager2">
+            <tx:attributes>
+                <tx:method name="*"/>
+                <tx:method name="get*" read-only="true"/>
+            </tx:attributes>
+        </tx:advice>
+        <!-- 3.配置事务切点,并把切点和事务属性关联起来 -->
+        <aop:config>
+            <aop:pointcut expression="execution(* org.activiti.manage.oa.daoImpl..*.*(..))" id="pointcut"/>
+            <aop:advisor advice-ref="txAdvice" pointcut-ref="pointcut"/>
+        </aop:config>
+
 	<!-- 配置事务管理器 -->
 	<bean id="transactionManager"
 		class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
 		<property name="dataSource" ref="dataSourceMybatis" />
+		<property name="sessionFactory" ref="sessionFactory"></property>
 	</bean>
 
 	<!-- 注解方式配置事物 -->
