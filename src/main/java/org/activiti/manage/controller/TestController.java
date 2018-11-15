@@ -71,8 +71,6 @@ public class TestController {
 		this.testService=testService;
 	}
 	
-	@Autowired
-    private org.activiti.manage.oa.dao.IBaseDao baseDao;  
 	
 	@RequestMapping("affair1")
 	public @ResponseBody
@@ -147,7 +145,6 @@ public class TestController {
 			
 			vacation.setDays(2);
 			
-			baseDao.add(vacation);
 		}
 	 
 	

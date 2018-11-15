@@ -77,7 +77,7 @@ http://www.springframework.org/schema/task http://www.springframework.org/schema
   			</props>
         </property> 
     </bean>   
-
+    
 	<!-- 配置Spring的声明式事务 -->
         <!-- 1.配置事务管理器 -->
         <bean id="transactionManager2" class="org.springframework.orm.hibernate4.HibernateTransactionManager">
@@ -92,7 +92,7 @@ http://www.springframework.org/schema/task http://www.springframework.org/schema
         </tx:advice>
         <!-- 3.配置事务切点,并把切点和事务属性关联起来 -->
         <aop:config>
-            <aop:pointcut expression="execution(* org.activiti.manage.oa.daoImpl..*.*(..))" id="pointcut"/>
+            <aop:pointcut expression="execution(* org.activiti.manage.h.daoImpl..*.*(..))" id="pointcut"/>
             <aop:advisor advice-ref="txAdvice" pointcut-ref="pointcut"/>
         </aop:config>
 

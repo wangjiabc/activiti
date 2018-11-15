@@ -45,7 +45,6 @@ import org.activiti.engine.task.Task;
 import org.activiti.manage.entity.Vacation;
 import org.activiti.manage.mapper.ReDeploymentMapper;
 import org.activiti.manage.model.ProcdefEntity;
-import org.activiti.manage.oa.dao.IBaseDao;
 import org.activiti.manage.tools.MyTestUtil;
 
 import org.activiti.spring.SpringProcessEngineConfiguration;
@@ -70,6 +69,7 @@ import org.activiti.explorer.navigation.NavigatorManager;
 import org.activiti.image.ProcessDiagramGenerator;
 import org.activiti.image.impl.DefaultProcessDiagramGenerator;
 
+
 @Controller  
 public class ActivitiController {  
     @Autowired  
@@ -91,8 +91,6 @@ public class ActivitiController {
    @Autowired
    ReDeploymentMapper reDeploymentMapper;
     
-   @Autowired
-   private IBaseDao baseDao;
    
     /** 
      * 查询生日列表 
@@ -423,7 +421,7 @@ public class ActivitiController {
 
          BpmnXMLConverter xmlConverter = new BpmnXMLConverter();
          BpmnModel bpmnModel = xmlConverter.convertToBpmnModel(reader);
-
+         MyTestUtil.print(bpmnModel);
          BpmnJsonConverter jsonConverter = new BpmnJsonConverter();
          JsonNode j =jsonConverter.convertToJson(bpmnModel);
 
@@ -525,38 +523,17 @@ public class ActivitiController {
      @RequestMapping(value = "/start")
      public @ResponseBody Map startProcessInstance(@RequestParam String processDefinitionKey,Integer days){
  		//流程定义的key
+ 
     	 Map<String, Object> variables = new HashMap<String, Object>();
-     	
-    	 Vacation vacation=new Vacation();
-    	 
+ 	    variables.put("customerName", "xxxxxx");
+ 	    variables.put("amount", 243232);
     	 
     	ProcessInstance pi = processEngineFactory.getRuntimeService()//与正在执行	的流程实例和执行对象相关的Service
-						.startProcessInstanceByKey(processDefinitionKey);  //使用流程定义的key启动流程实例,key对应helloworld.bpmn文件中id的属性值，使用key值启动，默认是按照最新版本的流程定义启动
-
-    	 vacation.setDays(days);
-    	 vacation.setId(Integer.parseInt(pi.getId()));
-    	 
-     	variables.put("entity", days); 
-     	variables.put("entity2", vacation); 
-     	variables.put("entity3", 7); 
+						.startProcessInstanceByKey(processDefinitionKey,variables);  //使用流程定义的key启动流程实例,key对应helloworld.bpmn文件中id的属性值，使用key值启动，默认是按照最新版本的流程定义启动
+  	
      	
      	Map map=new HashMap<>();
- 
-     	try {
-			baseDao.add(vacation);
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-	     	runtimeService.deleteProcessInstance(pi.getId(), "");
-			processEngineFactory.getTaskService().deleteTask(pi.getId());
-			processEngineFactory.getTaskService().deleteTask(pi.getId());
-			map.put("error:","false");//流程实例ID   101
-			return map;
-		}
-     	
- 	
- 		
- 		
+		
  		map.put("流程实例ID:",pi.getId());//流程实例ID   101
  		map.put("流程定义ID:",pi.getProcessDefinitionId());//流程定义ID
  		

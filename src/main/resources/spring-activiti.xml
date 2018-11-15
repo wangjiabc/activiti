@@ -56,12 +56,20 @@
 
     <bean id="entityManagerFactory" class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
         <property name="dataSource" ref="dataSource"/>
-        <property name="persistenceXmlLocation" value="classpath:/org/activiti/manage/jpa/custom-persistence.xml"/>
+        <property name="persistenceXmlLocation" value="classpath:persistence.xml"/>
         <property name="jpaVendorAdapter">
             <bean class="org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter">
                 <property name="databasePlatform" value="org.hibernate.dialect.MySQL5InnoDBDialect"/>
             </bean>
         </property>
+        <property name="jpaProperties"> 
+         	<props>
+		         <prop key="hibernate.show_sql">true</prop>
+		         <prop key="hibernate.format_sql">true</prop>
+		         <prop key="hibernate.dialect">org.hibernate.dialect.MySQLDialect</prop>
+		 	 <prop key="hibernate.hbm2ddl.auto">update</prop> 
+  			</props>
+        </property> 
     </bean>
     
  <!-- 配置Activiti -->
