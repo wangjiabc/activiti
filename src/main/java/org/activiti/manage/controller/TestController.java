@@ -14,8 +14,6 @@ import org.activiti.engine.runtime.ProcessInstance;
 import org.activiti.manage.context.Connect;
 import org.activiti.manage.dao.UserDAO;
 import org.activiti.manage.daoModel.Users;
-import org.activiti.manage.entity.Users1;
-import org.activiti.manage.entity.Vacation;
 import org.activiti.manage.mapper.ReDeploymentMapper;
 import org.activiti.manage.service.AffairService;
 import org.activiti.spring.SpringProcessEngineConfiguration;
@@ -26,15 +24,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
-
- 
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.EntityTransaction;
-import javax.persistence.Persistence;
-
-
-
 
 @RequestMapping("/test")
 @Controller 
@@ -63,12 +52,15 @@ public class TestController {
    @Autowired
    ReDeploymentMapper reDeploymentMapper;
 	
-	private AffairService testService;
+	private AffairService affairService;
+	
+	@Autowired
+	private org.activiti.manage.h.daoImpl.testDaoImpl testDaoImpl;
 	
 	@Transactional(rollbackFor = { Exception.class })
 	@Autowired
-	public void setTestService(AffairService testService) {
-		this.testService=testService;
+	public void setaffairService(AffairService affairService) {
+		this.affairService=affairService;
 	}
 	
 	
@@ -84,12 +76,12 @@ public class TestController {
 		
 		int i=0;
 		/*
-		i=testService.insertAll(paramMap);	 
+		i=affairService.insertAll(paramMap);	 
        */
 		
-		System.out.println(testService);
+		System.out.println(affairService);
 		
-		i=testService.insert1(paramMap);
+		i=affairService.insert1(paramMap);
 		
 		
 		return i;
@@ -108,7 +100,7 @@ public class TestController {
 		
 		int i=0;
 		
-	    i=testService.insert2(paramMap);
+	    i=affairService.insert2(paramMap);
     
 		return i;
 	}
@@ -139,11 +131,8 @@ public class TestController {
 	@RequestMapping(value = "/insert")
 	 public void testInsert() throws Exception {
 		
-			Users1 users = new Users1("1", "小明", 18);
-			
-			Vacation vacation=new Vacation();
-			
-			vacation.setDays(2);
+					
+			testDaoImpl.save2(1);
 			
 		}
 	 

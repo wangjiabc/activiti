@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <meta content="" name="description"/>
+    <meta content="webthemez" name="author"/>
+<link rel='stylesheet' type='text/css' href='../css/style.css'>
+<script type='text/javascript' src="../js/jquery.js"></script>
+    <title>泸州信息</title>
+</head>
+
+
+                    <form  id="userinfo-form">
+                        <div class="row">
+                            <div class="form-group col-sm-3">
+                                <label class="col-sm-4 control-label">姓名</label>
+                                <div class="col-sm-8">
+                                    <input type="text" class="form-control required" name="username"
+                                           id="username" placeholder="">
+                                </div>
+                            </div>
+						</div>
+
+					</form>
+
+		<div class="form-group">
+            <div class="col-sm-5">
+                <button class="mybtn mybtn-medium mybtn-green w100" id="submit" onclick="addInfo();">保存</button>
+                <button class="mybtn mybtn-medium mybtn-green w100" type="button" onclick="history.back();" class="btn">返回</button>
+            </div>
+        </div>
+					
+<script type="text/javascript">	
+
+	function addInfo() {
+        var clientInfo = new Object();
+
+        clientInfo.username = $("#username").val().toString();
+        var clientInfodata = JSON.stringify(clientInfo);
+        $.ajax({
+            type: "post",
+            async: false,
+            url: "../flow/start.do",
+            data: {
+            	processDefinitionKey:"process",
+            	variableData: clientInfodata,
+            	className:"test1"
+            	}
+
+            ,
+            success: function (data) {
+                if (data.state == "error") {
+                    alert("请确认信息填写完整");
+                    return false;
+                } else {
+   
+                       alert("添加成功");
+                      window.location.href = "Main.html";
+                    	
+                	}
+            }
+        })
+
+        
+	}
+</script>

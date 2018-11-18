@@ -32,16 +32,15 @@
     <class>org.activiti.standalone.jpa.CompoundIdJPAEntity</class>
     <class>org.activiti.standalone.jpa.EmbeddableCompoundId</class>
     
-    <class>org.activiti.manage.jpa.LoanRequest</class>
-    
     <exclude-unlisted-classes>true</exclude-unlisted-classes>
+    
     <properties>
         <property name="javax.persistence.jdbc.driver" value="com.mysql.jdbc.Driver" />
         <property name="javax.persistence.jdbc.url" value="${jdbc_url}" />
         <property name="javax.persistence.jdbc.user" value="${jdbc_username}" />
         <property name="javax.persistence.jdbc.password" value="${jdbc_password}" />
         <property name="hibernate.show_sql" value="true" />
-        <property name="hibernate.hbm2ddl.auto" value="create-drop" />
+        <property name="hibernate.hbm2ddl.auto" value="update" />
     </properties>
   </persistence-unit>
 </persistence>

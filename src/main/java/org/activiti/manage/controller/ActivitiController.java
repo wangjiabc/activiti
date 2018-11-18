@@ -42,7 +42,7 @@ import org.activiti.engine.repository.Model;
 import org.activiti.engine.repository.ProcessDefinition;
 import org.activiti.engine.runtime.ProcessInstance;
 import org.activiti.engine.task.Task;
-import org.activiti.manage.entity.Vacation;
+import org.activiti.manage.jpa.LoanRequest;
 import org.activiti.manage.mapper.ReDeploymentMapper;
 import org.activiti.manage.model.ProcdefEntity;
 import org.activiti.manage.tools.MyTestUtil;
@@ -50,6 +50,7 @@ import org.activiti.manage.tools.MyTestUtil;
 import org.activiti.spring.SpringProcessEngineConfiguration;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringEscapeUtils;
+import org.apache.poi.ss.formula.functions.EDate;
 import org.springframework.beans.factory.annotation.Autowired;  
 import org.springframework.stereotype.Controller;
 import org.springframework.util.LinkedMultiValueMap;
@@ -64,6 +65,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;  
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.voucher.manage.model.Users;
 
 import org.activiti.explorer.navigation.NavigatorManager;
 import org.activiti.image.ProcessDiagramGenerator;
@@ -524,14 +526,13 @@ public class ActivitiController {
      public @ResponseBody Map startProcessInstance(@RequestParam String processDefinitionKey,Integer days){
  		//流程定义的key
  
-    	 Map<String, Object> variables = new HashMap<String, Object>();
+    	Map<String, Object> variables = new HashMap<String, Object>();
  	    variables.put("customerName", "xxxxxx");
  	    variables.put("amount", 243232);
-    	 
+ 	    
     	ProcessInstance pi = processEngineFactory.getRuntimeService()//与正在执行	的流程实例和执行对象相关的Service
 						.startProcessInstanceByKey(processDefinitionKey,variables);  //使用流程定义的key启动流程实例,key对应helloworld.bpmn文件中id的属性值，使用key值启动，默认是按照最新版本的流程定义启动
-  	
-     	
+    	
      	Map map=new HashMap<>();
 		
  		map.put("流程实例ID:",pi.getId());//流程实例ID   101
@@ -565,43 +566,27 @@ public class ActivitiController {
  			list2.add(map);
  		}
  		
- 		//list2=getBaseVOList(list);
- 		
  		return list2;
  	}
      
      
-     protected List getBaseVOList(List<Task> tasks) {
-     	List taskList = new ArrayList();
-         for (Task task : tasks) {
-         	String processInstanceId = task.getProcessInstanceId();
-             ProcessInstance processInstance = this.runtimeService.createProcessInstanceQuery().processInstanceId(processInstanceId).active().singleResult();
-
-             //获取当前流程下的key为entity的variable
-             Object base =  this.runtimeService.getVariable(processInstance.getId(), "entity");
-             taskList.add(base);
-         }
-     	return taskList;
-     }
-     
      /**查询当前任务*/
      @RequestMapping(value = "/findMyTaskById")
-     public @ResponseBody String findMyPersonalTaskById(@RequestParam String id){
+     public @ResponseBody Object findMyPersonalTaskById(@RequestParam String id){
+    	
+    	 Object object = null; 
     	 
-    	 Object object=processEngineFactory.getRuntimeService().getVariable(id, "loanRequest");
+		try {
+			object=processEngineFactory.getRuntimeService().getVariables(id);
+			// object= processEngineFactory.getTaskService()// 与正在执行的任务管理相关的Service
+			//		.getVariable(id,"users");
+			MyTestUtil.print(object);
+		} catch (org.activiti.engine.ActivitiObjectNotFoundException e) {
+			// TODO: handle exception
+			return "ERROR：ID:"+id;
+		}
     	 
-    	 MyTestUtil.print(object);
-    	 /*
-    	 List list2 = new ArrayList<>();
-    	 
-    	 Iterator iterator=list.iterator();
-  		
-    	 while (iterator.hasNext()) {
- 			
-  			list2.add(iterator.next());
-  		}
-    	 */
-    	 return "";
+    	 return object;
     	
  	}
      
@@ -609,14 +594,25 @@ public class ActivitiController {
      @RequestMapping(value = "/personalTask")
  	public @ResponseBody Map completeMyPersonalTask(@RequestParam String taskId,Integer days){
 
-    	Map<String, Object> variables = new HashMap<String, Object>();
-    	
-    	variables.put("entity", days);
-    	
- 		processEngineFactory.getTaskService()//与正在执行的任务管理相关的Service
- 						.complete(taskId,variables);
- 		Map map=new HashMap<>();
- 		map.put("完成任务：任务ID:",taskId);
+    	 Map<String, Object> var = new HashMap<String, Object>();
+  	    var.put("hhh", "55");
+  	    var.put("opop", 5555555);
+  	    
+  	    Map map = new HashMap<>();
+  	    
+		try {
+			processEngineFactory.getTaskService().setVariables(taskId, var);
+			processEngineFactory.getTaskService()// 与正在执行的任务管理相关的Service
+					.complete(taskId, var);			
+			map.put("完成任务：任务ID:", taskId);
+			
+		} catch (org.activiti.engine.ActivitiObjectNotFoundException e) {
+			// TODO: handle exception
+			e.printStackTrace();
+			map.put("ERROR：任务ID:", taskId);
+		}
+ 		
+ 		
  		return map;
 
      }

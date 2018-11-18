@@ -3,7 +3,7 @@ package org.activiti.manage.h.daoImpl;
 import javax.annotation.Resource;
 import javax.transaction.TransactionalException;
 
-import org.activiti.manage.entity.PersonEntity;
+import org.activiti.manage.model.PersonEntity;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,11 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service("testService")
 public class testDaoImpl {
 
-      
-	//注入bean
-    @Resource(name="sqlSessionFactory")
-	private SessionFactory sqlsessionFactory;
-    
+          
 	@Resource(name="sessionFactory")
     private SessionFactory mysessionFactory;
 	
@@ -33,16 +29,36 @@ public class testDaoImpl {
         person.setName("路飞");  
         //得到外面已经管理好事务的session而不是opensession
 
-        Session session = sqlsessionFactory.getCurrentSession(); 
         Session mySession=mysessionFactory.getCurrentSession();
         
         //两个数据库手动包含事务
         try{
-         session.save(person);
          mySession.save(person);
         }catch (TransactionalException e) {
 			// TODO: handle exception
-        	session.getTransaction().rollback();
+        	mySession.getTransaction().rollback();
+		}
+        
+        
+        
+    }
+
+    
+    
+    @Transactional
+    public void save2(Integer id){
+    	
+	    	//Vacation vacation=new Vacation();
+    	PersonEntity personEntity=new PersonEntity();
+        //得到外面已经管理好事务的session而不是opensession
+
+        Session mySession=mysessionFactory.getCurrentSession();
+        
+        //两个数据库手动包含事务
+        try{
+         mySession.save(personEntity);
+        }catch (TransactionalException e) {
+			// TODO: handle exception
         	mySession.getTransaction().rollback();
 		}
         

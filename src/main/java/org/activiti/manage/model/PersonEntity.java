@@ -1,4 +1,4 @@
-package org.activiti.manage.entity;
+package org.activiti.manage.model;
 
 import javax.persistence.Column;  
 import javax.persistence.Entity;  
