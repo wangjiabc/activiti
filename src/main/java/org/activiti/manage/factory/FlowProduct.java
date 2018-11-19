@@ -19,4 +19,5 @@ public abstract class FlowProduct {
 
 	public abstract ProcessInstance start(String processDefinitionKey, String variableData,ProcessEngineConfiguration processEngineFactory);
 	
+	public abstract void personalTask(String taskId, String variableData,ProcessEngineConfiguration processEngineFactory);
 }

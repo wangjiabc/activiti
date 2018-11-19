@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <meta content="" name="description"/>
+    <meta content="webthemez" name="author"/>
+<link rel='stylesheet' type='text/css' href='../css/style.css'>
+<script type='text/javascript' src="../js/jquery.js"></script>
+    <title>泸州信息</title>
+</head>
+
+<div class="weui-cells">
+		  <div class="weui-panel weui-panel_access">
+  			<div id="count" class="weui-panel__hd"></div>
+  		  </div>           
+         <div id="ul" >
+            
+         </div>
+		</div>
+  
+		
+<script type="text/javascript">	
+
+
+    var html="";
+
+	$.ajax({
+		type : "post",
+		async : false,
+		url : "../selectAttachMent.do?limit=10&offset=0",
+		data : {
+		}
+
+		,
+		success : function(text) {
+			
+			var data=text.rows;
+			console.log(data);
+            if (data.length > 0) {
+         	   var i = 0;
+                for(; i < data.length; i++){
+             	   var obj = data[i];
+             	   
+             	   var taskId=obj.id;
+             	   
+
+             	   var li_1=addDiv(obj.assignee,obj.executionId,obj.id,obj.name,actionTime(obj.createTime));
+                    li_1.setAttribute("taskId",taskId);
+             	   li_1.setAttribute("onclick","clickEvent(this);");
+             	   $("#ul").append(li_1);
+                }
+    
+
+            }else {
+         	   html += "<li><div class=\"weui-cells__title\" >已无更多数据</div></li>";
+                $("#ul").append(html);
+         	   loading = true;
+            }
+		}
+	})
+
+	
+	 function addDiv(src,title,content,time,interval,manageRegion){
+        	  var li=document.createElement("li");
+              var div_1=document.createElement("div");
+               div_1.setAttribute("class","single-mode");
+              var div_1_1=document.createElement("div");
+               div_1_1.setAttribute("class","img-left");
+              var img=document.createElement("img");
+              if(src!=null){
+
+               div_1_1.appendChild(img);
+              }else{
+
+                  div_1_1.appendChild(img); 
+              }
+               div_1.appendChild(div_1_1);               
+              var div_2=document.createElement("div");
+               div_2.setAttribute("class","text-right");
+              var div_2_1=document.createElement("div");
+               div_2_1.setAttribute("class","single-inner");
+              var div_2_1_1=document.createElement("div");
+               div_2_1_1.setAttribute("class","title");
+               addSpan(div_2_1_1,title);
+              var div_2_1_2=document.createElement("div");
+              div_2_1_2.setAttribute("class","right_text");
+               addSpan(div_2_1_2,manageRegion);
+              var div_2_1_3=document.createElement("div");
+               addSpan(div_2_1_3,time);
+               div_2_1_3.setAttribute("class","weui-cells__title");
+               div_2_1_3.setAttribute("style","margin:2px 0px 2px 0px");
+              var div_2_1_4=document.createElement("div");
+               addSpan(div_2_1_4,content);
+               div_2_1_4.setAttribute("class","weui-cells__title");
+               div_2_1_4.setAttribute("style","margin:2px 0px 2px 0px");
+              var div_2_1_5=document.createElement("div");
+               addSpan(div_2_1_5,interval);
+               div_2_1_5.setAttribute("class","weui-cells__title");
+               div_2_1_5.setAttribute("style","margin:2px 0px 2px 0px"); 
+               
+               div_2_1.appendChild(div_2_1_1);
+               div_2_1.appendChild(div_2_1_2);
+               div_2_1.appendChild(div_2_1_3);
+               div_2_1.appendChild(div_2_1_4);
+               div_2_1.appendChild(div_2_1_5);
+               div_2.appendChild(div_2_1);
+               
+  
+			 li.appendChild(div_1);
+			 li.appendChild(div_2);
+			 
+			li.setAttribute("class","weui-cell");
+			 
+			 return li;
+          }
+	
+    
+    function addSpan(div,text){
+        var span_1=document.createElement("span");
+            span_1.innerHTML=text;
+            div.appendChild(span_1);
+        }
+    
+
+    function actionTime(value){
+	    var date = new Date(value); 
+	    Y = date.getFullYear() + '-';
+	    M = (date.getMonth()+1 < 10 ? '0'+(date.getMonth()+1) : date.getMonth()+1) + '-';
+	    D = date.getDate() + ' ';
+	    h = date.getHours() + ':';
+	    m = date.getMinutes() + ':';
+	    s = date.getSeconds(); 
+		return Y+M+D+h+m+s;
+	}
+	
+	function clickEvent(that){
+  	  var taskId=$(that).attr("taskId");
+
+	  location.href="task.html?taskId="+taskId;
+    }
+	
+</script>

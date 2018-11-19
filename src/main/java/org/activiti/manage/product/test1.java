@@ -3,7 +3,7 @@ package org.activiti.manage.product;
 import org.activiti.engine.ProcessEngineConfiguration;
 import org.activiti.engine.runtime.ProcessInstance;
 import org.activiti.manage.factory.FlowProduct;
-import org.activiti.manage.model.Vacation;
+import org.activiti.manage.product.model.Vacation;
 import org.json.JSONObject;
 
 public class test1 extends FlowProduct{
@@ -18,9 +18,9 @@ public class test1 extends FlowProduct{
 			
 			jsonObject= new JSONObject(variableData);
 			vacation.setUname(jsonObject.getString("username"));
-			
+			vacation.setAge(jsonObject.getInt("age"));
 			variables.put("vacation", vacation);
-			variables.put("jjjjjj", "llllllll");
+
 		}catch (Exception e) {
 			// TODO: handle exception
 			e.printStackTrace();
@@ -32,6 +32,32 @@ public class test1 extends FlowProduct{
 				// 的流程实例和执行对象相关的Service
 				.startProcessInstanceByKey(processDefinitionKey, variables); // 使用流程定义的key启动流程实例,key对应helloworld.bpmn文件中id的属性值，使用key值启动，默认是按照最新版本的流程定义启动
 		return pi;
+	}
+
+	@Override
+	public void personalTask(String taskId, String variableData,
+			ProcessEngineConfiguration processEngineFactory) {
+		// TODO Auto-generated method stub
+		
+		Vacation vacation = (Vacation) processEngineFactory.getTaskService()// 与正在执行的任务管理相关的Service
+				.getVariable(taskId,"vacation");
+		
+		try {
+
+			jsonObject = new JSONObject(variableData);
+			vacation.setUname(jsonObject.getString("username"));
+			vacation.setAge(jsonObject.getInt("age"));
+			variables.put("vacation", vacation);
+
+		} catch (Exception e) {
+			// TODO: handle exception
+			e.printStackTrace();
+		}
+		
+		processEngineFactory.getTaskService().setVariables(taskId, variables);
+		processEngineFactory.getTaskService()// 与正在执行的任务管理相关的Service
+				.complete(taskId, variables);
+		
 	}
 
 	

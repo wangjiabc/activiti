@@ -17,7 +17,6 @@ import org.activiti.engine.task.Task;
 import org.activiti.manage.factory.FlowFactory;
 import org.activiti.manage.h.daoImpl.ProcessDaoImpl;
 import org.activiti.manage.mapper.ReDeploymentMapper;
-import org.activiti.manage.model.Vacation;
 import org.activiti.manage.product.test1;
 import org.activiti.manage.tools.MyTestUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -55,25 +54,23 @@ public class FlowController {
 	public @ResponseBody Map startProcessInstance(@RequestParam String processDefinitionKey,
 			@RequestParam String variableData,@RequestParam String className) {
 		// 流程定义的key
-
-		Map<String, Object> variables = new HashMap<String, Object>();
-		variables.put("customerName", "xxxxxx");
-		variables.put("amount", 243232);
-
-		//ProcessInstance pi =new test1().start(processDefinitionKey,variableData,processEngineFactory);
-		ProcessInstance pi = new FlowFactory(className).getProduct().start(processDefinitionKey, variableData, processEngineFactory);
-		/*
-		ProcessInstance pi = processEngineFactory.getRuntimeService()// 与正在执行
-																		// 的流程实例和执行对象相关的Service
-				.startProcessInstanceByKey(processDefinitionKey, variables); // 使用流程定义的key启动流程实例,key对应helloworld.bpmn文件中id的属性值，使用key值启动，默认是按照最新版本的流程定义启动
-		 */
+		
 		Map map = new HashMap<>();
-
-		map.put("state", "succeed");
-		map.put("流程实例ID:", pi.getId());// 流程实例ID 101
-		map.put("流程定义ID:", pi.getProcessDefinitionId());// 流程定义ID
+		
+		try {
+			ProcessInstance pi = new FlowFactory(className).getProduct().start(processDefinitionKey, variableData,
+					processEngineFactory);
+			map.put("state", "succeed");
+			map.put("流程实例ID:", pi.getId());// 流程实例ID 101
+			map.put("流程定义ID:", pi.getProcessDefinitionId());// 流程定义ID
+		} catch (Exception e) {
+			// TODO: handle exception
+			e.printStackTrace();
+			map.put("state", "failed");
+		}
 
 		return map;
+
 	}
 
 	/** 查询当前人的个人任务 */
@@ -110,9 +107,9 @@ public class FlowController {
 		Object object = null;
 
 		try {
-			 object=processEngineFactory.getRuntimeService().getVariables(id);
-			//object = processEngineFactory.getTaskService()// 与正在执行的任务管理相关的Service
-			//		.getVariable(id,"");
+			 //object=processEngineFactory.getRuntimeService().getVariables(id);
+			object = processEngineFactory.getTaskService()// 与正在执行的任务管理相关的Service
+					.getVariables(id);
 			 
 			MyTestUtil.print(object);
 		} catch (org.activiti.engine.ActivitiObjectNotFoundException e) {
@@ -126,23 +123,20 @@ public class FlowController {
 
 	/** 完成我的任务 */
 	@RequestMapping(value = "/personalTask")
-	public @ResponseBody Map completeMyPersonalTask(@RequestParam String taskId, Integer days) {
-
-		Map<String, Object> var = new HashMap<String, Object>();
-		var.put("hhh", "55");
-		var.put("opop", 5555555);
+	public @ResponseBody Map completeMyPersonalTask(@RequestParam String taskId, @RequestParam String variableData,
+			@RequestParam String className) {
 
 		Map map = new HashMap<>();
 
 		try {
-			processEngineFactory.getTaskService().setVariables(taskId, var);
-			processEngineFactory.getTaskService()// 与正在执行的任务管理相关的Service
-					.complete(taskId, var);
+			
+			new FlowFactory(className).getProduct().personalTask(taskId, variableData,processEngineFactory);
 			map.put("完成任务：任务ID:", taskId);
 
 		} catch (org.activiti.engine.ActivitiObjectNotFoundException e) {
 			// TODO: handle exception
 			e.printStackTrace();
+			map.put("state", "failed");
 			map.put("ERROR：任务ID:", taskId);
 		}
 

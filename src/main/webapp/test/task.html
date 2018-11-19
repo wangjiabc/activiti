@@ -42,30 +42,61 @@
 					
 <script type="text/javascript">	
 
+	function getQueryString(name) {
+    	var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)", "i");
+    	var r = window.location.search.substr(1).match(reg);
+    	console.log(r);
+    	if (r != null) return unescape(r[2]); return null;
+   	}
+
+	var taskId=getQueryString("taskId");
+	console.log(taskId);
+	
+	 $.ajax({
+         type: "post",
+         async: false,
+         url: "../flow/findMyTaskById.do",
+         data: {
+        	 id:taskId
+         	}
+
+         ,
+         success: function (data) {
+            console.log(data.vacation.age);
+            $("#username").val(data.vacation.uname);
+            $("#age").val(data.vacation.age);
+         }
+     })
+	
+	
 	function addInfo() {
         var clientInfo = new Object();
 
         clientInfo.username = $("#username").val().toString();
         clientInfo.age = $("#age").val().toString();
+        
         var clientInfodata = JSON.stringify(clientInfo);
         $.ajax({
             type: "post",
             async: false,
-            url: "../flow/start.do",
+            url: "../flow/personalTask.do",
             data: {
-            	processDefinitionKey:"process",
+            	
             	variableData: clientInfodata,
-            	className:"test1"
+            	className:"test1",
+            	taskId:taskId
             	}
 
             ,
             success: function (data) {
-                if (data.state == "error") {
+            	console.log(data);
+                if (data.state == "failed") {
                     alert("error");
                     return false;
                 } else {
    
                        alert("添加成功");
+                       history.go(-2);
                     	
                 	}
             }

@@ -1,4 +1,4 @@
-package org.activiti.manage.model;
+package org.activiti.manage.product.model;
 
 import java.io.Serializable;
 
@@ -21,8 +21,7 @@ import org.hibernate.annotations.DynamicUpdate;
 //即在插入和修改数据的时候,语句中只包括要插入或者修改的字段。
 //@DynamicUpdate(true)
 //@DynamicInsert(true)
-public class Vacation implements Serializable{
-	private static final long serialVersionUID = 1L;
+public class Vacation extends basic{
 	
 	//标注id
 	//@Id
