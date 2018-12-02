@@ -20,6 +20,7 @@ import javax.crypto.KeyGenerator;
  */
 
 public class Sign {
+	
 	/**
 	 * 签名生成算法
 	 * @param HashMap<String,String> params 请求参数集，所有参数必须已转换为字符串类型

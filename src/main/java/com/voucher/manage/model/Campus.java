@@ -73,7 +73,7 @@ public class Campus {
 
 	public String getLoginTime2() {
 		try{
-			loginTime2 = new java.text.SimpleDateFormat("yyyyÄêMMÔÂddÈÕ HH:mm").format(loginTime);
+			loginTime2 = new java.text.SimpleDateFormat("yyyyï¿½ï¿½MMï¿½ï¿½ddï¿½ï¿½ HH:mm").format(loginTime);
 			}catch (Exception e) {
 				// TODO: handle exception
 				loginTime2=null;

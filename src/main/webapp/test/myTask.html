@@ -41,14 +41,13 @@
             if (data.length > 0) {
          	   var i = 0;
                 for(; i < data.length; i++){
+                	console.log(data);
              	   var obj = data[i];
              	   
              	   var taskId=obj.id;
-             	   
-
              	   var li_1=addDiv(obj.assignee,obj.executionId,obj.id,obj.name,actionTime(obj.createTime));
                     li_1.setAttribute("taskId",taskId);
-             	   li_1.setAttribute("onclick","clickEvent(this);");
+             	   li_1.setAttribute("onclick","clickEvent('"+taskId+"');");
              	   $("#ul").append(li_1);
                 }
     
@@ -135,10 +134,24 @@
 		return Y+M+D+h+m+s;
 	}
 	
-	function clickEvent(that){
-  	  var taskId=$(that).attr("taskId");
+	function clickEvent(taskId){
+		$.ajax({
+			type : "post",
+			async : false,
+			url : "../flow/findMyTaskById.do",
+			data : {
+				id:taskId
+			}
 
-	  location.href="task.html?taskId="+taskId;
-    }
+			,
+			success : function(data) {
+				
+				var userId=data.userId;
+	  			
+				location.href="../flow/toRoute.do?taskId="+taskId+"&userId="+userId+"&className=neaten";
+			
+			}
+		});
+	}
 	
 </script>

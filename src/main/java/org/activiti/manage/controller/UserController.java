@@ -17,8 +17,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.voucher.manage.model.Users;
 
-import io.swagger.annotations.Authorization;
-
 
 @RequestMapping(value = "/user")
 @Controller

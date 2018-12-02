@@ -16,8 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 //要注入必要要求当前对象在容器里
 @Service("testService")
 public class testDaoImpl {
-
-          
+ 
 	@Resource(name="sessionFactory")
     private SessionFactory mysessionFactory;
 	

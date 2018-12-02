@@ -7,15 +7,16 @@ import java.util.Map;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.activiti.manage.mapper2.AccessMapper;
-import org.activiti.manage.mapper2.User_AssetMapper;
-import org.activiti.manage.mapper2.UsersMapper;
-import org.activiti.manage.service.UserService;
 
 import com.voucher.manage.model.Access;
 import com.voucher.manage.model.SNSUserInfo;
 import com.voucher.manage.model.User_Asset;
 import com.voucher.manage.model.Users;
+
+import org.activiti.manage.mapper2.AccessMapper;
+import org.activiti.manage.mapper2.User_AssetMapper;
+import org.activiti.manage.mapper2.UsersMapper;
+import org.activiti.manage.service.UserService;
 
 
 

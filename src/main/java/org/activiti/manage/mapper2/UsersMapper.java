@@ -11,6 +11,7 @@ import com.voucher.manage.model.Users;
 
 
 public interface UsersMapper {
+	
     int deleteByPrimaryKey(String phone);
 
     int insert(Users record);

@@ -17,7 +17,6 @@ import org.activiti.engine.task.Task;
 import org.activiti.manage.factory.FlowFactory;
 import org.activiti.manage.h.daoImpl.ProcessDaoImpl;
 import org.activiti.manage.mapper.ReDeploymentMapper;
-import org.activiti.manage.product.test1;
 import org.activiti.manage.tools.MyTestUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -52,17 +51,27 @@ public class FlowController {
 	/** 启动流程实例 **/
 	@RequestMapping(value = "/start")
 	public @ResponseBody Map startProcessInstance(@RequestParam String processDefinitionKey,
-			@RequestParam String variableData,@RequestParam String className) {
+			@RequestParam String userId,@RequestParam String variableData,@RequestParam String className) {
 		// 流程定义的key
 		
 		Map map = new HashMap<>();
 		
 		try {
-			ProcessInstance pi = new FlowFactory(className).getProduct().start(processDefinitionKey, variableData,
+			// 用来设置启动流程的人员ID，引擎会自动把用户ID保存到activiti:initiator中
+			processEngineFactory.getIdentityService().setAuthenticatedUserId(userId);
+			
+			ProcessInstance pi = new FlowFactory(className).getProduct().start(userId,processDefinitionKey, variableData,
 					processEngineFactory);
 			map.put("state", "succeed");
-			map.put("流程实例ID:", pi.getId());// 流程实例ID 101
-			map.put("流程定义ID:", pi.getProcessDefinitionId());// 流程定义ID
+			
+			System.out.println("pi="+pi);
+			
+			if (pi != null) {
+				map.put("流程实例ID:", pi.getId());// 流程实例ID 101
+				map.put("流程定义ID:", pi.getProcessDefinitionId());// 流程定义ID
+			} else {
+				map.put("state", "failed");
+			}
 		} catch (Exception e) {
 			// TODO: handle exception
 			e.printStackTrace();
@@ -78,7 +87,7 @@ public class FlowController {
 	public @ResponseBody List findMyPersonalTask(@RequestParam String assignee) {
 		List<Task> list = processEngineFactory.getTaskService()// 与正在执行的任务管理相关的Service
 				.createTaskQuery()// 创建任务查询
-				.taskAssigneeLike("%" + assignee + "%")// 指定个人任查询，指定办理人
+				.taskAssigneeLike(assignee)// 指定个人任查询，指定办理人
 				.orderByTaskCreateTime().desc().list();
 		List list2 = new ArrayList<>();
 		Iterator iterator = list.iterator();
@@ -100,6 +109,18 @@ public class FlowController {
 		return list2;
 	}
 
+	
+	/** 跳转到任务页面 */
+	@RequestMapping(value = "/toRoute")
+	public String toRoute(@RequestParam String taskId,@RequestParam String userId,@RequestParam String className) {
+
+		String path=new FlowFactory(className).getProduct().route(taskId, userId, historyService);
+		
+		return path;
+
+	}
+	
+	
 	/** 查询当前任务 */
 	@RequestMapping(value = "/findMyTaskById")
 	public @ResponseBody Object findMyPersonalTaskById(@RequestParam String id) {
@@ -123,14 +144,14 @@ public class FlowController {
 
 	/** 完成我的任务 */
 	@RequestMapping(value = "/personalTask")
-	public @ResponseBody Map completeMyPersonalTask(@RequestParam String taskId, @RequestParam String variableData,
+	public @ResponseBody Map completeMyPersonalTask(@RequestParam String taskId,@RequestParam Integer input,@RequestParam String variableData,
 			@RequestParam String className) {
 
 		Map map = new HashMap<>();
 
 		try {
 			
-			new FlowFactory(className).getProduct().personalTask(taskId, variableData,processEngineFactory);
+			new FlowFactory(className).getProduct().personalTask(taskId,input,variableData,processEngineFactory,historyService);
 			map.put("完成任务：任务ID:", taskId);
 
 		} catch (org.activiti.engine.ActivitiObjectNotFoundException e) {
@@ -159,4 +180,5 @@ public class FlowController {
     	
     }
 	
+    
 }

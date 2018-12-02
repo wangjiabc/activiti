@@ -74,6 +74,7 @@ import org.activiti.image.impl.DefaultProcessDiagramGenerator;
 
 @Controller  
 public class ActivitiController {  
+	
     @Autowired  
     private RepositoryService repositoryService;  
     
@@ -238,10 +239,10 @@ public class ActivitiController {
      @ResponseBody
      public String selectProcdef(@RequestParam Integer limit,@RequestParam Integer offset){
          List<ProcessDefinition> resultList = repositoryService.createProcessDefinitionQuery()
-        		 .orderByDeploymentId()
+        		 .orderByDeploymentId().orderByProcessDefinitionVersion()
         		 .desc().listPage(offset, limit);
          List<Deployment> deploymentList=repositoryService.createDeploymentQuery()
-        		 .orderByDeploymentId()
+        		 .orderByDeploymentId().orderByDeploymenTime()
         		 .desc().listPage(offset, limit);
          long total=repositoryService.createProcessDefinitionQuery().count();
          MyTestUtil.print(resultList);
