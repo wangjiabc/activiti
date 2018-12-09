@@ -1,5 +1,6 @@
 package org.activiti.manage.controller;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -12,6 +13,7 @@ import org.activiti.engine.runtime.ProcessInstance;
 import org.activiti.manage.context.Connect;
 import org.activiti.manage.dao.UserDAO;
 import org.activiti.manage.daoModel.Users;
+import org.activiti.manage.h.daoImpl.ProcessDaoImpl;
 import org.activiti.manage.mapper.ReDeploymentMapper;
 import org.activiti.manage.service.AffairService;
 import org.activiti.spring.SpringProcessEngineConfiguration;
@@ -22,6 +24,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+
+import com.rmi.server.entity.RoomInfoFlowIdEntity;
 
 @RequestMapping("/test")
 @Controller 
@@ -54,6 +58,9 @@ public class TestController {
 	
 	@Autowired
 	private org.activiti.manage.h.daoImpl.testDaoImpl testDaoImpl;
+	
+	@Autowired
+	ProcessDaoImpl processDaoImpl;
 	
 	@Transactional(rollbackFor = { Exception.class })
 	@Autowired
@@ -133,8 +140,42 @@ public class TestController {
 			testDaoImpl.save2(1);
 			
 		}
-	 
 	
+	// 插入数据 persist 相当于hibernate save方法
+	@RequestMapping(value = "/save")
+	public void save() throws Exception {
+		RoomInfoFlowIdEntity roomInfoFlowIdEntity=new RoomInfoFlowIdEntity();
+		
+		roomInfoFlowIdEntity.setUpdate_time(new Date());
+		processDaoImpl.save(roomInfoFlowIdEntity);
+
+	}
+
+	// 插入数据 persist 相当于hibernate save方法
+	@RequestMapping(value = "/del")
+	public void del(@RequestParam String id) throws Exception {
+
+		processDaoImpl.del(id);
+
+	}
+	
+	// 插入数据 persist 相当于hibernate save方法
+		@RequestMapping(value = "/select")
+		public @ResponseBody Map select(@RequestParam Integer r,@RequestParam int limit,@RequestParam int offset) throws Exception {
+
+			return processDaoImpl.selectAll(r, limit, offset);
+
+		}
+
+	// 插入数据 persist 相当于hibernate save方法
+	@RequestMapping(value = "/selectById")
+	public @ResponseBody Map selectById(@RequestParam String openId,@RequestParam Integer r, @RequestParam int limit, @RequestParam int offset)
+			throws Exception {
+
+		return processDaoImpl.selectByOpenId(openId, r, limit, offset);
+
+	}
+		
 	@RequestMapping(value = "/def")
 	 public void def() throws Exception {
 		

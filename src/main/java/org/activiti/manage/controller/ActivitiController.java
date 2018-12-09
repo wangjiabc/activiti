@@ -33,6 +33,8 @@ import org.activiti.engine.history.HistoricProcessInstance;
 import org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.activiti.engine.impl.context.Context;
 import org.activiti.engine.impl.persistence.entity.DeploymentEntity;
+import org.activiti.engine.impl.persistence.entity.ExecutionEntity;
+import org.activiti.engine.impl.persistence.entity.HistoricVariableInstanceEntity;
 import org.activiti.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.activiti.engine.impl.persistence.entity.TaskEntity;
 import org.activiti.engine.impl.pvm.PvmTransition;
@@ -45,6 +47,7 @@ import org.activiti.engine.task.Task;
 import org.activiti.manage.jpa.LoanRequest;
 import org.activiti.manage.mapper.ReDeploymentMapper;
 import org.activiti.manage.model.ProcdefEntity;
+import org.activiti.manage.service.UserService;
 import org.activiti.manage.tools.MyTestUtil;
 
 import org.activiti.spring.SpringProcessEngineConfiguration;
@@ -91,10 +94,16 @@ public class ActivitiController {
     ProcessEngineConfiguration processEngineFactory;
     
     
-   @Autowired
-   ReDeploymentMapper reDeploymentMapper;
+    @Autowired
+    ReDeploymentMapper reDeploymentMapper;
     
-   
+	UserService userService;
+
+	@Autowired
+	public void setUserService(UserService userService) {
+		this.userService = userService;
+	}
+
     /** 
      * 查询生日列表 
      *  
@@ -314,12 +323,32 @@ public class ActivitiController {
          List list=new ArrayList<>();
          while(iterator.hasNext()){
         	 Task task=(Task) iterator.next();
+        	 List processList=processEngineFactory.getRuntimeService().createProcessInstanceQuery().processInstanceId(task.getProcessInstanceId()).list();
+        	 ExecutionEntity executionEntity=new ExecutionEntity();
+			 try {
+				executionEntity = (ExecutionEntity) processList.get(0);
+			 } catch (Exception e) {
+				// TODO: handle exception
+				e.printStackTrace();
+			 }
+			 
+			 Map taskMap=processEngineFactory.getTaskService().getVariables(task.getId());
+				
+			 String userId=(String) taskMap.get("userId");
+			 
+			 Users assigneeUsers=userService.getUserByOnlyOpenId(task.getAssignee());
+			 
+			 Users users=userService.getUserByOnlyOpenId(userId);
+			 
         	 Map map=new HashMap<>();
         	 map.put("id",task.getId());
         	 map.put("owner",task.getOwner());
-        	 map.put("name",task.getName());
-        	 map.put("assignee",task.getAssignee());
-        	 map.put("description",task.getDescription());
+        	 map.put("name",executionEntity.getName());
+        	 if(assigneeUsers!=null)
+        		 map.put("assignee",assigneeUsers.getName());
+        	 if(users!=null)
+        		 map.put("userId",users.getName());
+        	 map.put("description",task.getName());
         	 map.put("executionId",task.getExecutionId());
         	 map.put("processInstanceId",task.getProcessInstanceId());
         	 map.put("processDefinitionId",task.getProcessDefinitionId());
@@ -342,7 +371,6 @@ public class ActivitiController {
 			
 			String[] processInstanceIdStrings = processInstanceIds.split(",");
 			System.out.println("processInstanceIdStrings="+processInstanceIdStrings);
-			// 娑擄拷濞嗏�冲灩闂勩倕顦挎稉顏堟祩妞嬶拷
 			for (String processInstanceId : processInstanceIdStrings) {
 				try{
 					//runtimeService.suspendProcessInstanceById(processInstanceId); //冻结
@@ -635,15 +663,45 @@ public class ActivitiController {
            while (iterator.hasNext()) {
 			
         	   HistoricProcessInstance historicProcessInstance=(HistoricProcessInstance) iterator.next();
+        	   System.out.println("historicProcessInstance=");
+        	   MyTestUtil.print(historicProcessInstance);
         	   
         	   Map hMap=new HashMap<>();
+        	   
+        	   Users startUser=userService.getUserByOnlyOpenId(historicProcessInstance.getStartUserId());
+        	   
+        	   List list2=historyService.createHistoricVariableInstanceQuery().excludeTaskVariables().executionId(historicProcessInstance.getId()).list();
+        	   
+        	   Iterator<HistoricVariableInstanceEntity> iterator2=list2.iterator();
+        	   
+        	   int input = 0;
+        	   
+        	   while (iterator2.hasNext()) {
+
+        		   HistoricVariableInstanceEntity historicVariableInstanceEntity=iterator2.next();
+        		   
+        		   if(historicVariableInstanceEntity.getName().equals("input")){
+        			   input=(int) historicVariableInstanceEntity.getCachedValue();
+        			   break;
+        		   }
+        	   }
+        	   
+        	   System.out.println("list2=");
+        	   
+        	   MyTestUtil.print(list2);
+        	   
+        	   String userId = null;
+        	   
+        	   if(startUser!=null&&!startUser.equals("")){
+        		   userId=startUser.getName();
+        	   }
         	   
         	   hMap.put("id",historicProcessInstance.getId());
         	   hMap.put("name",historicProcessInstance.getName());
         	   hMap.put("processDefinitionId", historicProcessInstance.getProcessDefinitionId());
         	   hMap.put("processDefinitionKey", historicProcessInstance.getProcessDefinitionKey());
-        	   hMap.put("businessKey",historicProcessInstance.getBusinessKey());        	   
-        	   hMap.put("description",historicProcessInstance.getDescription());
+        	   hMap.put("startUserId",userId);        	   
+        	   hMap.put("result",input);
         	   hMap.put("deploymentId",historicProcessInstance.getDeploymentId());
         	   hMap.put("endTime",historicProcessInstance.getEndTime());
            

@@ -19,6 +19,8 @@ xmlns:task="http://www.springframework.org/schema/task"
 		
 	<context:component-scan base-package="org.activiti.manage.h.daoImpl" />
 	
+	<context:component-scan base-package="org.activiti.manage.execution" />
+	
 	<context:annotation-config />  
     <!--spring扫描注解的配置   -->  
     <context:component-scan base-package="org.activiti.manage.mytask" /> 

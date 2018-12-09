@@ -66,7 +66,7 @@ http://www.springframework.org/schema/task http://www.springframework.org/schema
 
 	<bean id="sessionFactory" class="org.springframework.orm.hibernate4.LocalSessionFactoryBean"> 
         <property name="dataSource" ref="dataSourceMybatis" /> 
-		<property name="packagesToScan" value="org.activiti.manage.entity,org.activiti.manage.jpa">
+		<property name="packagesToScan" value="org.activiti.manage.entity,com.rmi.server.entity,org.activiti.manage.jpa">
 		</property>
         <property name="hibernateProperties"> 
          	<props>
@@ -76,8 +76,8 @@ http://www.springframework.org/schema/task http://www.springframework.org/schema
 		 	 <prop key="hibernate.hbm2ddl.auto">update</prop> 
   			</props>
         </property> 
-    </bean>   
-    
+    </bean>
+
 	<!-- 配置Spring的声明式事务 -->
         <!-- 1.配置事务管理器 -->
         <bean id="transactionManager2" class="org.springframework.orm.hibernate4.HibernateTransactionManager">

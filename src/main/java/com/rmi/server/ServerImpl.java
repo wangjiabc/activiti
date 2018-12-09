@@ -5,6 +5,7 @@ import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -21,7 +22,10 @@ import org.activiti.engine.history.HistoricActivityInstance;
 import org.activiti.engine.history.HistoricProcessInstance;
 import org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.activiti.engine.impl.context.Context;
+import org.activiti.engine.impl.persistence.entity.ExecutionEntity;
+import org.activiti.engine.impl.persistence.entity.HistoricVariableInstanceEntity;
 import org.activiti.engine.impl.persistence.entity.ProcessDefinitionEntity;
+import org.activiti.engine.impl.persistence.entity.TaskEntity;
 import org.activiti.engine.impl.pvm.PvmTransition;
 import org.activiti.engine.impl.pvm.process.ActivityImpl;
 import org.activiti.engine.runtime.ProcessInstance;
@@ -31,14 +35,20 @@ import org.activiti.image.impl.DefaultProcessDiagramGenerator;
 import org.activiti.manage.factory.FlowFactory;
 import org.activiti.manage.h.daoImpl.ProcessDaoImpl;
 import org.activiti.manage.mapper.ReDeploymentMapper;
+import org.activiti.manage.service.UserService;
 import org.activiti.manage.tools.FileConvect;
 import org.activiti.manage.tools.MyTestUtil;
 import org.activiti.spring.SpringProcessEngineConfiguration;
+import org.hibernate.Session;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.alibaba.fastjson.JSONObject;
+import com.rmi.server.entity.Neaten;
+import com.rmi.server.entity.RoomInfoFlowIdEntity;
+import com.voucher.manage.model.Users;
 
 //继承该类， UnicastRemoteObject，暴露远程服务  
 public class ServerImpl implements Server {  
@@ -64,33 +74,56 @@ public class ServerImpl implements Server {
 	@Autowired
 	ProcessDaoImpl processDaoImpl;
 	
+	UserService userService;
+
+	@Autowired
+	public void setUserService(UserService userService) {
+		this.userService = userService;
+	}
+	
 	/** 启动流程实例 **/
-	public Map startProcessInstance(@RequestParam String processDefinitionKey,
-			@RequestParam String userId,@RequestParam String variableData,@RequestParam String className) {
+	public Map startProcessInstance (@RequestParam String processDefinitionKey,
+			@RequestParam String userId,@RequestParam String variableData,@RequestParam String className) 
+					throws Exception{
 		// 流程定义的key
 		
 		Map map = new HashMap<>();
 		
-		try {
-			// 用来设置启动流程的人员ID，引擎会自动把用户ID保存到activiti:initiator中
-			processEngineFactory.getIdentityService().setAuthenticatedUserId(userId);
-			
-			ProcessInstance pi = new FlowFactory(className).getProduct().start(userId,processDefinitionKey, variableData,
-					processEngineFactory);
+		org.json.JSONObject jsonObject=new org.json.JSONObject(variableData);
+		
+		RoomInfoFlowIdEntity roomInfoFlowIdEntity=new RoomInfoFlowIdEntity();
+		
+		roomInfoFlowIdEntity.setProcessInstanceId("");
+		roomInfoFlowIdEntity.setOpenId(userId);
+		roomInfoFlowIdEntity.setGuid(jsonObject.getString("guid"));
+		roomInfoFlowIdEntity.setApplicationUser(jsonObject.getString("username"));
+		roomInfoFlowIdEntity.setAddress(jsonObject.getString("address"));
+		roomInfoFlowIdEntity.setType(className);
+		roomInfoFlowIdEntity.setResult(0);
+		roomInfoFlowIdEntity.setDate(new Date());
+		roomInfoFlowIdEntity.setUpdate_time(new Date());
+		roomInfoFlowIdEntity.setState(1);
+		
+		// 用来设置启动流程的人员ID，引擎会自动把用户ID保存到activiti:initiator中
+		processEngineFactory.getIdentityService().setAuthenticatedUserId(userId);
+
+		ProcessInstance pi = new FlowFactory(className).getProduct().start(userId, processDefinitionKey, variableData,
+				processEngineFactory);
+		map.put("state", "流程启动成功");
+
+		roomInfoFlowIdEntity.setProcessInstanceId(pi.getProcessInstanceId());
+		
+		System.out.println("pi=" + pi);
+		
+		if (pi != null) {
+
+			processDaoImpl.save(roomInfoFlowIdEntity);
+			map.put("id", pi.getId());// 流程实例ID 101
 			map.put("state", "succeed");
-			
-			System.out.println("pi="+pi);
-			
-			if (pi != null) {
-				map.put("流程实例ID:", pi.getId());// 流程实例ID 101
-				map.put("流程定义ID:", pi.getProcessDefinitionId());// 流程定义ID
-			} else {
-				map.put("state", "failed");
-			}
-		} catch (Exception e) {
-			// TODO: handle exception
-			e.printStackTrace();
-			map.put("state", "failed");
+			map.put("流程定义ID:", pi.getProcessDefinitionId());// 流程定义ID
+
+		} else {
+			map.put("state", "流程启动失败");
 		}
 
 		return map;
@@ -98,36 +131,69 @@ public class ServerImpl implements Server {
 	}
 
 	/** 查询当前人的个人任务 */
-	public List findMyPersonalTask(@RequestParam String assignee) {
+	public Map findMyPersonalTask(@RequestParam String assignee,@RequestParam Integer limit,@RequestParam Integer offset) {
 		List<Task> list = processEngineFactory.getTaskService()// 与正在执行的任务管理相关的Service
 				.createTaskQuery()// 创建任务查询
 				.taskAssigneeLike(assignee)// 指定个人任查询，指定办理人
-				.orderByTaskCreateTime().desc().list();
+				.orderByTaskCreateTime().desc().listPage(offset, limit);
+		
+		long count=processEngineFactory.getTaskService()// 与正在执行的任务管理相关的Service
+				.createTaskQuery()// 创建任务查询
+				.taskAssigneeLike(assignee).count();
+		
 		List list2 = new ArrayList<>();
 		Iterator iterator = list.iterator();
 		while (iterator.hasNext()) {
 
 			Map map = new HashMap<>();
 			Task task = (Task) iterator.next();
-			map.put("任务ID:", task.getId());
-			map.put("任务名称:", task.getName());
-			map.put("任务的创建时间:", task.getCreateTime());
-			map.put("任务的办理人:", task.getAssignee());
-			map.put("流程实例ID:", task.getProcessInstanceId());
-			map.put("执行对象ID:", task.getExecutionId());
-			map.put("流程定义ID:", task.getProcessDefinitionId());
+			
+			List processList = processEngineFactory.getRuntimeService().createProcessInstanceQuery()
+					.processInstanceId(task.getProcessInstanceId()).list();
+			
+			ExecutionEntity executionEntity = new ExecutionEntity();
+			
+			try {
+				executionEntity = (ExecutionEntity) processList.get(0);
+			} catch (Exception e) {
+				// TODO: handle exception
+				e.printStackTrace();
+			}
+			
+			Map taskMap=processEngineFactory.getTaskService().getVariables(task.getId());
+			
+			String userId=(String) taskMap.get("userId");
+			
+			Users users = userService.getUserByOnlyOpenId(userId);
+			
+			map.put("id", task.getId());
+			map.put("taskName", task.getName());
+			map.put("name", executionEntity.getName());
+			map.put("createTime", task.getCreateTime());
+			map.put("assignee", task.getAssignee());
+			if(users!=null)
+				map.put("userName", users.getName());
+			map.put("processInstanceId", task.getProcessInstanceId());
+			map.put("executionId", task.getExecutionId());
+			map.put("processDefinitionId", task.getProcessDefinitionId());
 
 			list2.add(map);
 		}
 
-		return list2;
+		Map map=new HashMap<>();
+		
+		map.put("rows", list2);
+		
+		map.put("total", count);
+		
+		return map;
 	}
 
 	
 	/** 跳转到任务页面 */
-	public String toRoute(@RequestParam String taskId,@RequestParam String userId,@RequestParam String className) {
+	public String toRoute(@RequestParam String taskId,@RequestParam String className) {
 
-		String path=new FlowFactory(className).getProduct().route(taskId, userId, historyService);
+		String path=new FlowFactory(className).getProduct().route(taskId,processEngineFactory,historyService);
 		
 		return path;
 
@@ -157,10 +223,13 @@ public class ServerImpl implements Server {
 
 	/** 完成我的任务 */
 	public Map completeMyPersonalTask(@RequestParam String taskId,@RequestParam Integer input,@RequestParam String variableData,
-			@RequestParam String className) {
+			@RequestParam String className) throws Exception{
 
 		Map map = new HashMap<>();
 
+		System.out.println("input="+input);
+		
+		
 		try {
 			
 			new FlowFactory(className).getProduct().personalTask(taskId,input,variableData,processEngineFactory,historyService);
@@ -177,50 +246,264 @@ public class ServerImpl implements Server {
 
 	}
 	
-	
-	 /**获取全部历史流程实例*/
-    public List findHistoryById(@RequestParam String id,HttpServletResponse response){
-    	
-    	List list=historyService.createHistoricDetailQuery()
-    	.variableUpdates()
-    	.taskId(id)
-    	.orderByVariableName().asc()
-    	.list();
-    	
-    	return list;
-    	
-    }
 
-    
     public JSONObject selectAttachMent(@RequestParam Integer limit,@RequestParam Integer offset){
-   	 List<Task> resultList = processEngineFactory.getTaskService()//与正在执行的任务管理相关的Service
-					.createTaskQuery().orderByTaskCreateTime().desc().listPage(offset, limit);
-   	 long total=processEngineFactory.getTaskService()//与正在执行的任务管理相关的Service
-					.createTaskQuery().count();
-        MyTestUtil.print(resultList);
-        Iterator iterator=resultList.iterator();
-        List list=new ArrayList<>();
-        while(iterator.hasNext()){
-       	 Task task=(Task) iterator.next();
-       	 Map map=new HashMap<>();
-       	 map.put("id",task.getId());
-       	 map.put("owner",task.getOwner());
-       	 map.put("name",task.getName());
-       	 map.put("assignee",task.getAssignee());
-       	 map.put("description",task.getDescription());
-       	 map.put("executionId",task.getExecutionId());
-       	 map.put("processInstanceId",task.getProcessInstanceId());
-       	 map.put("processDefinitionId",task.getProcessDefinitionId());
-       	 map.put("createTime",task.getCreateTime());
-       	 list.add(map);
-       	 System.out.println(map);
-        }
-        JSONObject resultJson = new JSONObject();
-        resultJson.put("rows", list);
-        resultJson.put("total", total);
-        return resultJson;
+		List<Task> resultList = processEngineFactory.getTaskService()// 与正在执行的任务管理相关的Service
+				.createTaskQuery().orderByTaskCreateTime().desc().listPage(offset, limit);
+		long total = processEngineFactory.getTaskService()// 与正在执行的任务管理相关的Service
+				.createTaskQuery().count();
+		MyTestUtil.print(resultList);
+		Iterator iterator = resultList.iterator();
+		List list = new ArrayList<>();
+		while (iterator.hasNext()) {
+			Task task = (Task) iterator.next();
+			List processList = processEngineFactory.getRuntimeService().createProcessInstanceQuery()
+					.processInstanceId(task.getProcessInstanceId()).list();
+			ExecutionEntity executionEntity = new ExecutionEntity();
+			try {
+				executionEntity = (ExecutionEntity) processList.get(0);
+			} catch (Exception e) {
+				// TODO: handle exception
+				e.printStackTrace();
+			}
+
+			Map taskMap = processEngineFactory.getTaskService().getVariables(task.getId());
+
+			String userId = (String) taskMap.get("userId");
+
+			Users assigneeUsers = userService.getUserByOnlyOpenId(task.getAssignee());
+
+			Users users = userService.getUserByOnlyOpenId(userId);
+
+			Map map = new HashMap<>();
+			map.put("id", task.getId());
+			map.put("owner", task.getOwner());
+			map.put("name", executionEntity.getName());
+			map.put("assignee", assigneeUsers.getName());
+			map.put("userId", users.getName());
+			map.put("description", task.getName());
+			map.put("executionId", task.getExecutionId());
+			map.put("processInstanceId", task.getProcessInstanceId());
+			map.put("processDefinitionId", task.getProcessDefinitionId());
+			map.put("createTime", task.getCreateTime());
+			list.add(map);
+			System.out.println(map);
+			
+		}
+		JSONObject resultJson = new JSONObject();
+		resultJson.put("rows", list);
+		resultJson.put("total", total);
+		return resultJson;
     }
     
+	 /**获取历史流程实例*/
+    public Map findHistoryById(@RequestParam String id){
+    	
+    	List list2=historyService.createHistoricVariableInstanceQuery()
+    			.excludeTaskVariables().executionId(id).list();
+        
+    	Map hMap=new HashMap<>();
+    	
+    	 Iterator<HistoricVariableInstanceEntity> iterator2=list2.iterator();
+     	   
+     	   int input = 0;
+     	   
+     	   int i=0;
+     	   
+     	   while (iterator2.hasNext()) {
+
+     		   HistoricVariableInstanceEntity historicVariableInstanceEntity=iterator2.next();
+     		   
+     		   hMap.put(i, historicVariableInstanceEntity.toString());
+
+     		   if(historicVariableInstanceEntity.getName().equals("neaten")){
+     			   Neaten neaten=(Neaten) historicVariableInstanceEntity.getCachedValue();
+     			   hMap.put("neaten", neaten);
+     		   }
+     		   
+     		   i++;
+     	   }
+     	   
+     	   System.out.println("list2=");
+     	   
+     	   MyTestUtil.print(list2);
+     	   
+     	   String userId = null;
+
+        
+
+    	
+    	return hMap;
+    	
+    }
+    
+    /**获取全部历史流程实例*/
+    public Map findMyAllHistory(@RequestParam String assignee,@RequestParam Integer limit,@RequestParam Integer offset){
+        
+          List<HistoricProcessInstance> historicProcess =  historyService.createHistoricProcessInstanceQuery().involvedUser(assignee).orderByProcessInstanceEndTime().desc().listPage(offset, limit);
+          
+          MyTestUtil.print(historicProcess);
+          
+          long total=historyService.createHistoricProcessInstanceQuery().count();
+          
+          Iterator iterator=historicProcess.iterator();
+          
+          List list=new ArrayList<>();
+          
+          while (iterator.hasNext()) {
+			
+       	   HistoricProcessInstance historicProcessInstance=(HistoricProcessInstance) iterator.next();
+       	   System.out.println("historicProcessInstance=");
+       	   MyTestUtil.print(historicProcessInstance);
+       	   
+       	   Map hMap=new HashMap<>();
+       	   
+       	   Users startUser=userService.getUserByOnlyOpenId(historicProcessInstance.getStartUserId());
+       	   
+       	   List list2=historyService.createHistoricVariableInstanceQuery().excludeTaskVariables().executionId(historicProcessInstance.getId()).list();
+       	   
+       	   Iterator<HistoricVariableInstanceEntity> iterator2=list2.iterator();
+       	   
+       	   int input = 0;
+       	   
+       	   while (iterator2.hasNext()) {
+
+       		   HistoricVariableInstanceEntity historicVariableInstanceEntity=iterator2.next();
+       		   
+       		   if(historicVariableInstanceEntity.getName().equals("input")){
+       			   input=(int) historicVariableInstanceEntity.getCachedValue();
+       			   break;
+       		   }
+       	   }
+       	   
+       	   System.out.println("list2=");
+       	   
+       	   MyTestUtil.print(list2);
+       	   
+       	   String userId = null;
+       	   
+       	   if(startUser!=null&&!startUser.equals("")){
+       		   userId=startUser.getName();
+       	   }
+       	   
+       	   hMap.put("id",historicProcessInstance.getId());
+       	   hMap.put("name",historicProcessInstance.getName());
+       	   hMap.put("processDefinitionId", historicProcessInstance.getProcessDefinitionId());
+       	   hMap.put("processDefinitionKey", historicProcessInstance.getProcessDefinitionKey());
+       	   hMap.put("startUserId",userId);        	   
+       	   hMap.put("result",input);
+       	   hMap.put("deploymentId",historicProcessInstance.getDeploymentId());
+       	   hMap.put("endTime",historicProcessInstance.getEndTime());
+          
+       	   list.add(hMap);
+          }
+          
+          Map map=new HashMap<>();
+          
+          map.put("rows", list);
+          map.put("total", total);
+          
+          return map;
+    }
+    
+    /**获取全部历史流程实例*/
+    public Map findAllHistory(@RequestParam Integer limit,@RequestParam Integer offset){
+        
+          List<HistoricProcessInstance> historicProcess =  historyService.createHistoricProcessInstanceQuery().orderByProcessInstanceEndTime().desc().listPage(offset, limit);
+          
+          MyTestUtil.print(historicProcess);
+          
+          long total=historyService.createHistoricProcessInstanceQuery().count();
+          
+          Iterator iterator=historicProcess.iterator();
+          
+          List list=new ArrayList<>();
+          
+          while (iterator.hasNext()) {
+			
+       	   HistoricProcessInstance historicProcessInstance=(HistoricProcessInstance) iterator.next();
+       	   System.out.println("historicProcessInstance=");
+       	   MyTestUtil.print(historicProcessInstance);
+       	   
+       	   Map hMap=new HashMap<>();
+       	   
+       	   Users startUser=userService.getUserByOnlyOpenId(historicProcessInstance.getStartUserId());
+       	   
+       	   List list2=historyService.createHistoricVariableInstanceQuery().excludeTaskVariables().executionId(historicProcessInstance.getId()).list();
+       	   
+       	   Iterator<HistoricVariableInstanceEntity> iterator2=list2.iterator();
+       	   
+       	   int input = 0;
+       	   
+       	   while (iterator2.hasNext()) {
+
+       		   HistoricVariableInstanceEntity historicVariableInstanceEntity=iterator2.next();
+       		   
+       		   if(historicVariableInstanceEntity.getName().equals("input")){
+       			   input=(int) historicVariableInstanceEntity.getCachedValue();
+       			   break;
+       		   }
+       	   }
+       	   
+       	   System.out.println("list2=");
+       	   
+       	   MyTestUtil.print(list2);
+       	   
+       	   String userId = null;
+       	   
+       	   if(startUser!=null&&!startUser.equals("")){
+       		   userId=startUser.getName();
+       	   }
+       	   
+       	   hMap.put("id",historicProcessInstance.getId());
+       	   hMap.put("name",historicProcessInstance.getName());
+       	   hMap.put("processDefinitionId", historicProcessInstance.getProcessDefinitionId());
+       	   hMap.put("processDefinitionKey", historicProcessInstance.getProcessDefinitionKey());
+       	   hMap.put("startUserId",userId);        	   
+       	   hMap.put("result",input);
+       	   hMap.put("deploymentId",historicProcessInstance.getDeploymentId());
+       	   hMap.put("endTime",historicProcessInstance.getEndTime());
+          
+       	   list.add(hMap);
+          }
+          
+          Map map=new HashMap<>();
+          
+          map.put("rows", list);
+          map.put("total", total);
+          
+          return map;
+    }
+    
+    
+	public Map selectAll(@RequestParam Integer result,@RequestParam int limit,@RequestParam int offset){
+
+		return processDaoImpl.selectAll(result, limit, offset);
+
+	}
+
+	public Map selectAllByState(@RequestParam Integer state,@RequestParam int limit,@RequestParam int offset){
+		
+		return processDaoImpl.selectAllByState(state, limit, offset);
+		
+	}
+	
+	 public Map selectById(String guid,int result,int limit,int offset){
+		 
+		 return processDaoImpl.selectById(guid, result, limit, offset);
+		 
+	 }
+	
+	public Map selectByOpenId(@RequestParam String openId, @RequestParam Integer result, @RequestParam int limit,
+			@RequestParam int offset){
+
+		return processDaoImpl.selectByOpenId(openId, result, limit, offset);
+
+	} 
+    
+	public Integer del(String guid) throws Exception{
+		return processDaoImpl.del(guid);
+	}
     
     /**
      * 读取带跟踪的图片

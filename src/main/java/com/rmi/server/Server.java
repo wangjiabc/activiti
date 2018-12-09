@@ -1,34 +1,47 @@
 package com.rmi.server;
 
-import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+
 
 import com.alibaba.fastjson.JSONObject;
 
 public interface Server {
 
 	public Map startProcessInstance(@RequestParam String processDefinitionKey,
-			@RequestParam String userId,@RequestParam String variableData,@RequestParam String className);
+			@RequestParam String userId,@RequestParam String variableData,@RequestParam String className) throws Exception;
 	
-	public List findMyPersonalTask(@RequestParam String assignee);
-	
-	
-	public String toRoute(@RequestParam String taskId,@RequestParam String userId,@RequestParam String className);
+	public Map findMyPersonalTask(@RequestParam String assignee,@RequestParam Integer limit,@RequestParam Integer offset);
+		
+	public String toRoute(@RequestParam String taskId,@RequestParam String className);
 	
 	public Object findMyPersonalTaskById(@RequestParam String id);
 	
 	public Map completeMyPersonalTask(@RequestParam String taskId,@RequestParam Integer input,@RequestParam String variableData,
-			@RequestParam String className);
+			@RequestParam String className) throws Exception;
 	
-	public List findHistoryById(@RequestParam String id,HttpServletResponse response);
+	public Map findHistoryById(@RequestParam String id);
 	
 	public JSONObject selectAttachMent(@RequestParam Integer limit,@RequestParam Integer offset);
+	
+	public Map findMyAllHistory(@RequestParam String assignee,@RequestParam Integer limit,@RequestParam Integer offset);
+	
+	public Map findAllHistory(@RequestParam Integer limit,@RequestParam Integer offset);
+	
+	public Map selectAll(@RequestParam Integer result,@RequestParam int limit,@RequestParam int offset);
+	
+	public Map selectAllByState(@RequestParam Integer state,@RequestParam int limit,@RequestParam int offset);
+	
+	public Map selectById(String guid,int result,int limit,int offset);
+	
+	public Map selectByOpenId(@RequestParam String openId, @RequestParam Integer r, @RequestParam int limit,
+			@RequestParam int offset);
+	
+	public Integer del(String guid)throws Exception;
 	
 	public byte[] readResource(@RequestParam String executionId)throws Exception;
 	

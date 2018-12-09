@@ -40,6 +40,7 @@
         <property name="javax.persistence.jdbc.user" value="${jdbc_username}" />
         <property name="javax.persistence.jdbc.password" value="${jdbc_password}" />
         <property name="hibernate.show_sql" value="true" />
+        <property name="hibernate.connection.characterEncoding">utf-8</property>
         <property name="hibernate.hbm2ddl.auto" value="update" />
     </properties>
   </persistence-unit>

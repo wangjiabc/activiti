@@ -18,8 +18,8 @@ import com.rmi.server.entity.Deliveran;
 import com.rmi.server.entity.FlowData;
 import com.rmi.server.entity.Neaten;
 
-public class neaten extends FlowProduct{
-	
+public class test extends FlowProduct{
+
 	@Override
 	public ProcessInstance start(String userId,String processDefinitionKey, String variableData,
 			ProcessEngineConfiguration processEngineFactory) throws Exception{
@@ -38,9 +38,9 @@ public class neaten extends FlowProduct{
 		FlowData flowData=new FlowData();
 		
 		List<Deliveran> list=new ArrayList<>();
-
+		
 		Date date=new Date();
-
+		
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 		String time = sdf.format(new Date());
 
@@ -65,7 +65,7 @@ public class neaten extends FlowProduct{
 		neaten.setCheckItemDate(jsonObject.getString("checkItemDate"));
 		neaten.setDate(date);
 		neaten.setApplicationUser(jsonObject.getString("username"));
-
+		
 		SimpleDateFormat sdf2 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		String time2 = sdf2.format(date);
 
@@ -88,7 +88,6 @@ public class neaten extends FlowProduct{
 		list.add(deliveran);
 
 		flowData.setDeliverans(list);
-
 		
 		variables.put("neaten", neaten);
 
@@ -124,9 +123,9 @@ public class neaten extends FlowProduct{
 		System.out.println("currentUserId="+currentUserId);
 		
 		if(userId.equals(currentUserId)){
-			path="/mobile/flow/reTask";
+			path="/testFlow/reTask";
 		}else{
-			path="/mobile/flow/task";
+			path="/testFlow/task";
 		}
 		
 		return path;
@@ -147,17 +146,14 @@ public class neaten extends FlowProduct{
 		JSONObject jsonObject;
 		
 		Map<String, Object> variables=new HashMap<>();
-		
-		Date date=new Date();
-		
 
+		System.out.println("currentUserId="+currentUserId);
+		System.out.println("userId="+taskMap.get("userId"));
+		
 		SimpleDateFormat sdf = new SimpleDateFormat(" yyyy-MM-dd HH:mm:ss ");
 		String time = sdf.format(new Date());
 
 		jsonObject = new JSONObject(variableData);
-
-		System.out.println("currentUserId=" + currentUserId);
-		System.out.println("userId=" + taskMap.get("userId"));
 
 		if (!currentUserId.equals(taskMap.get("userId"))) {
 
@@ -172,13 +168,10 @@ public class neaten extends FlowProduct{
 
 			Deliveran deliveran = new Deliveran();
 
-			System.out.println("content=" + jsonObject.getString("content"));
-			System.out.println("username=" + jsonObject.getString("username"));
-
 			deliveran.setContent(jsonObject.getString("content"));
 			deliveran.setUserName(jsonObject.getString("username"));
-			deliveran.setDate(date);
-			MyTestUtil.print(deliveran);
+			deliveran.setDate(new Date());
+
 			list.add(deliveran);
 
 			flowData.setDeliverans(list);
@@ -186,8 +179,7 @@ public class neaten extends FlowProduct{
 			variables.put("input", input);
 
 			variables.put("flowData", flowData);
-			MyTestUtil.print(flowData);
-			MyTestUtil.print(variables);
+
 			System.out.println("variablesuserid=" + taskMap.get("userId"));
 
 		} else {
@@ -215,9 +207,9 @@ public class neaten extends FlowProduct{
 			variables.put("neaten", neaten);
 			
 			variables.put("flowData", flowData);
-
+			
 		}
-		
+
 		if(input==2){
 			
 			flowData.setTemplate_Id("LWfojRihMettsLzgs72r4oP86UIBRsEvrUKeMZbRpM4");
@@ -227,19 +219,15 @@ public class neaten extends FlowProduct{
 			flowData.setUrl("http://lzgfgs.com/voucher/mobile/1/flow/myTask.html");
 			
 			variables.put("flowData", flowData);
-			
 		}
 		
 		System.out.println("variables=");
 		
 		MyTestUtil.print(variables);
-	
+		
 		processEngineFactory.getTaskService().setVariables(taskId, variables);
 		processEngineFactory.getTaskService()// 与正在执行的任务管理相关的Service
 				.complete(taskId, variables);
-			
 	}
-
-
-
+	
 }

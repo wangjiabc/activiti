@@ -114,13 +114,12 @@ public class FlowController {
 	@RequestMapping(value = "/toRoute")
 	public String toRoute(@RequestParam String taskId,@RequestParam String userId,@RequestParam String className) {
 
-		String path=new FlowFactory(className).getProduct().route(taskId, userId, historyService);
+		String path=new FlowFactory(className).getProduct().route(taskId,processEngineFactory,historyService);
 		
 		return path;
 
 	}
-	
-	
+		
 	/** 查询当前任务 */
 	@RequestMapping(value = "/findMyTaskById")
 	public @ResponseBody Object findMyPersonalTaskById(@RequestParam String id) {
@@ -154,7 +153,7 @@ public class FlowController {
 			new FlowFactory(className).getProduct().personalTask(taskId,input,variableData,processEngineFactory,historyService);
 			map.put("完成任务：任务ID:", taskId);
 
-		} catch (org.activiti.engine.ActivitiObjectNotFoundException e) {
+		} catch (Exception e) {
 			// TODO: handle exception
 			e.printStackTrace();
 			map.put("state", "failed");

@@ -9,7 +9,6 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 
-
 /**
  * 这个类是方便控制台输出object，主要应用java反射机制。 因为考虑到使用性和美观性，没有使用无限递归。
  * 而是在toStr方法中加入一个boolean recursion ，是否递归。
