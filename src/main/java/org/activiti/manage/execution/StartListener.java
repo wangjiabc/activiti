@@ -1,10 +1,19 @@
 package org.activiti.manage.execution;
 
+import java.io.Serializable;
+import java.util.Date;
+import java.util.Map;
+
 import org.activiti.engine.ProcessEngineConfiguration;
 import org.activiti.engine.delegate.DelegateExecution;
 import org.activiti.engine.delegate.ExecutionListener;
-import org.activiti.engine.impl.persistence.entity.TaskEntity;
+import org.activiti.manage.context.ConnectSession;
+import org.activiti.manage.tools.MyTestUtil;
+import org.hibernate.Session;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import com.rmi.server.entity.Neaten;
+import com.rmi.server.entity.RoomInfoFlowIdEntity;
 
 
 public class StartListener implements ExecutionListener{
@@ -23,10 +32,40 @@ public class StartListener implements ExecutionListener{
 		// TODO Auto-generated method stub
 		
 		System.out.println("execution="+execution);
-		String executionId=execution.getId();
+		String processInstanceId=execution.getProcessInstanceId();
+
+		Map exeMap=execution.getVariables();
+		Neaten neaten=(Neaten) exeMap.get("neaten");
 		
-		TaskEntity taskEntity=(TaskEntity) execution.getEngineServices().getTaskService().createTaskQuery().executionId(executionId).singleResult();
+		String userId =(String) exeMap.get("userId");
 		
+		Session session=new ConnectSession().get();
+		
+		RoomInfoFlowIdEntity roomInfoFlowIdEntity=new RoomInfoFlowIdEntity();
+		
+		roomInfoFlowIdEntity.setProcessInstanceId(processInstanceId);
+		roomInfoFlowIdEntity.setOpenId(userId);
+		roomInfoFlowIdEntity.setGuid(neaten.getGUID());
+		roomInfoFlowIdEntity.setApplicationUser(neaten.getApplicationUser());
+		roomInfoFlowIdEntity.setAddress(neaten.getAddress());
+		roomInfoFlowIdEntity.setType(neaten.getType());
+		roomInfoFlowIdEntity.setResult(0);
+		roomInfoFlowIdEntity.setDate(new Date());
+		roomInfoFlowIdEntity.setUpdate_time(new Date());
+		roomInfoFlowIdEntity.setState(1);
+
+		session.beginTransaction();
+		
+		Serializable result =session.save(roomInfoFlowIdEntity);
+		
+		int i=(int) result;
+                
+        if(i<1){
+        	session.getTransaction().rollback();
+        	throw new Exception();
+        }
+        
+        session.getTransaction().commit();
 	}
 
 

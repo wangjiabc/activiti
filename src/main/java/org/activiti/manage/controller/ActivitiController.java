@@ -190,8 +190,7 @@ public class ActivitiController {
  					
  					map.put("status", "flase");
  					map.put("message", "删除失败");
- 					
- 					return map;
+
 				}
  			}
 
@@ -300,8 +299,7 @@ public class ActivitiController {
 					
 					map.put("status", "flase");
 					map.put("message", "删除失败");
-					
-					return map;
+
 				}
 			}
 
@@ -382,8 +380,7 @@ public class ActivitiController {
 					
 					map.put("status", "flase");
 					map.put("message", "删除失败");
-					
-					return map;
+
 				}
 			}
 
@@ -646,6 +643,33 @@ public class ActivitiController {
 
      }
     
+     @RequestMapping(value="/deleteHistory")
+     @ResponseBody
+     public Map deleteHistory(@RequestParam String processInstanceIds){
+
+			Map<String, Object> map = new HashMap<String, Object>();
+			
+			String[] processInstanceIdStrings = processInstanceIds.split(",");
+			System.out.println("processInstanceIdStrings="+processInstanceIdStrings);
+			// 娑擄拷濞嗏�冲灩闂勩倕顦挎稉顏堟祩妞嬶拷
+			for (String processInstanceId : processInstanceIdStrings) {
+				try{
+					historyService.deleteHistoricProcessInstance(processInstanceId);
+				}catch (Exception e) {
+					// TODO: handle exception
+					e.printStackTrace();
+					
+					map.put("status", "flase");
+					map.put("message", "删除失败");
+				}
+			}
+
+			map.put("status", "success");
+			map.put("message", "删除成功");
+
+		return map;    	 
+     }
+     
      /**获取全部历史流程实例*/
      @RequestMapping(value = "/findAllHistory")
      public @ResponseBody Map findAllHistory(@RequestParam Integer limit,@RequestParam Integer offset, HttpServletResponse response){

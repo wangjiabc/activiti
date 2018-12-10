@@ -163,8 +163,7 @@ public class FlowController {
 		return map;
 
 	}
-	
-	
+		
 	 /**获取全部历史流程实例*/
     @RequestMapping(value = "/findHistoryById")
     public @ResponseBody List findHistoryById(@RequestParam String id,HttpServletResponse response){

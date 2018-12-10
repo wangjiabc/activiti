@@ -1,5 +1,6 @@
 package org.activiti.manage.execution;
 
+import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -15,13 +16,16 @@ import javax.annotation.Resource;
 import org.activiti.engine.delegate.DelegateExecution;
 import org.activiti.engine.delegate.ExecutionListener;
 import org.activiti.engine.impl.persistence.entity.TaskEntity;
+import org.activiti.manage.context.ConnectSession;
 import org.activiti.manage.context.DBUtils;
 import org.activiti.manage.tools.MyTestUtil;
 import org.apache.http.message.BasicNameValuePair;
+import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 
 import com.rmi.server.entity.FlowData;
 import com.rmi.server.entity.Neaten;
+import com.rmi.server.entity.RoomInfoFlowIdEntity;
 import com.sun.org.glassfish.external.statistics.annotations.Reset;
 
 import common.HttpClient;
@@ -33,9 +37,6 @@ public class EndListener implements ExecutionListener{
 	private static final String requestUrl = "http://127.0.0.1:8080/voucher/mobile/WechatSendMessage/send.do";
 	
 	private static HttpClient httpClient = new HttpClient();
-
-	@Resource(name="sessionFactory")
-    private SessionFactory sessionFactory;
 	
 	@Override
 	public void notify(DelegateExecution execution) throws Exception {
@@ -78,6 +79,7 @@ public class EndListener implements ExecutionListener{
 		SimpleDateFormat sdf = new SimpleDateFormat(" yyyy-MM-dd HH:mm:ss ");
 		String time = sdf.format(new Date());
 		
+		/*
 		String sql="update roominfo_flowid  set Result_='"+input+"', Update_time_='"+time+"'"
 				+ ",State_ = 0  where GUID_='"+neaten.getGUID()+"' "
 				+ " and ProcessInstanceId_='"+taskEntity.getProcessInstanceId()+"'";
@@ -92,19 +94,49 @@ public class EndListener implements ExecutionListener{
         if(i<1){
         	throw new Exception();
         }
-        
+        */
 		
 		FlowData flowData=(FlowData) taskMap.get("flowData");
-		
-		
-		
+						
 		String result="";
+
+		Session session=new ConnectSession().get();
+		
+		RoomInfoFlowIdEntity roomInfoFlowIdEntity=new RoomInfoFlowIdEntity();
+		
+		roomInfoFlowIdEntity.setCurrentOpenId(taskEntity.getAssignee());
+		roomInfoFlowIdEntity.setResult(input);		
+		roomInfoFlowIdEntity.setUpdate_time(new Date());
+		roomInfoFlowIdEntity.setState(0);
+		
+		session.beginTransaction();
+		
+		int i=session.createQuery("update RoomInfoFlowIdEntity set currentOpenId=? , update_time=?,"
+				+ "state=? , result=? where processInstanceId=?")
+				.setString(0, taskEntity.getAssignee()).setDate(1, new Date())
+				.setInteger(2, 0).setInteger(3, input)
+				.setString(4, taskEntity.getProcessInstanceId()).executeUpdate();
+
+		if (i < 1) {
+			session.getTransaction().rollback();
+			throw new Exception();
+		}
 		
 		if(input==1){
 			result="已通过";
 		}else{
 			result="已拒绝";
+			
+			i=session.createQuery("delete RoomInfoFlowIdEntity where processInstanceId=?").setString(0, taskEntity.getProcessInstanceId()).executeUpdate();
+		       
+	        if(i<1){
+	        	session.getTransaction().rollback();
+	        	throw new Exception();
+	        }
+			
 		}
+
+		session.getTransaction().commit();
 
 		List<BasicNameValuePair> reqParam = new ArrayList<BasicNameValuePair>();
 		reqParam.add(new BasicNameValuePair("openId", userId));

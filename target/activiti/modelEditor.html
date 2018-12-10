@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+</head>
+<body>
+
+<div class="panel-body">
+    <form id="demoForm" method="post" action="saveModel.do" class="form-horizontal">
+		<input id="id" type="hidden" name="id">
+        <input id="name" type="hidden" name="name">
+        <div class="form-group">
+            <div class="col-sm-11">
+                <textarea id="xml" name="xml" rows="50"style="width:100%" ></textarea>
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-sm-5">
+                <button class="mybtn mybtn-medium mybtn-green w100" id="submitButton" type="submit" class="btn">保存</button>
+                &nbsp;
+                <button class="mybtn mybtn-medium mybtn-green w100" type="button" onclick="history.back();" class="btn">返回</button>
+            </div>
+        </div>
+    </form>
+</div>
+
+</body>
+
+<script type='text/javascript' src="js/jquery.js"></script>
+
+<script type="text/javascript">
+
+ function getQueryString(name) {
+    var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)", "i");
+    var r = window.location.search.substr(1).match(reg);
+    if (r != null) return unescape(r[2]); return null;
+   }
+
+ var modelId=getQueryString("modelId");
+ var name=getQueryString("name");
+
+ $("#id").attr("value",modelId);
+ $("#name").attr("value",name);
+ 
+ $.post("export1.do",{
+	 modelId: modelId
+ 	},function(text){
+
+       $("#xml").html(text);
+ 		
+ 		
+ });
+
+</script>
+
+</html>

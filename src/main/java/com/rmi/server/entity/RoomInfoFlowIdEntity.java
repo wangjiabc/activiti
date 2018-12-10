@@ -32,6 +32,9 @@ public class RoomInfoFlowIdEntity implements java.io.Serializable{
 	@Column(name = "Open_id_")
 	private String openId;
 	
+	@Column(name = "CurrentOpen_id_")
+	private String currentOpenId;
+	
 	@Column(name = "Type_")
 	private String type;
 	
@@ -135,5 +138,13 @@ public class RoomInfoFlowIdEntity implements java.io.Serializable{
 
 	public void setState(Integer state) {
 		this.state = state;
+	}
+
+	public String getCurrentOpenId() {
+		return currentOpenId;
+	}
+
+	public void setCurrentOpenId(String currentOpenId) {
+		this.currentOpenId = currentOpenId;
 	}
 }

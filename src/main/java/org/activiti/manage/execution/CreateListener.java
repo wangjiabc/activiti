@@ -1,5 +1,6 @@
 package org.activiti.manage.execution;
 
+import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.text.SimpleDateFormat;
@@ -10,10 +11,12 @@ import java.util.Map;
 
 import org.activiti.engine.delegate.DelegateTask;
 import org.activiti.engine.delegate.TaskListener;
+import org.activiti.manage.context.ConnectSession;
 import org.activiti.manage.context.DBUtils;
 import org.activiti.manage.h.daoImpl.ProcessDaoImpl;
 import org.activiti.manage.tools.MyTestUtil;
 import org.apache.http.message.BasicNameValuePair;
+import org.hibernate.Session;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -23,14 +26,11 @@ import com.rmi.server.entity.RoomInfoFlowIdEntity;
 
 import common.HttpClient;
 
-@Service("taskListenerService")
 public class CreateListener implements TaskListener{
 
 	/**
 	 * 
 	 */
-	@Autowired
-	ProcessDaoImpl processDaoImpl;
 	
 	private static final long serialVersionUID = 1L;
 
@@ -56,7 +56,7 @@ public class CreateListener implements TaskListener{
 		
 		SimpleDateFormat sdf = new SimpleDateFormat(" yyyy-MM-dd HH:mm:ss ");
 		String time = sdf.format(new Date());
-		
+		/*
 		String sql="update roominfo_flowid set  Update_time_='"+time+"'  where GUID_='"+neaten.getGUID()+"'";
 		
 		System.out.println("sql="+sql);
@@ -66,12 +66,27 @@ public class CreateListener implements TaskListener{
 		try {
 			connection = DBUtils.getConnection();
 			PreparedStatement prep = connection.prepareStatement(sql);  
-	        int i= prep.executeUpdate(sql);
+	        prep.executeUpdate(sql);
 		} catch (Exception e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
+		 */
+		
+		Session session=new ConnectSession().get();
+		
+		RoomInfoFlowIdEntity roomInfoFlowIdEntity=new RoomInfoFlowIdEntity();
+		
+		roomInfoFlowIdEntity.setCurrentOpenId(assignee);
+		roomInfoFlowIdEntity.setUpdate_time(new Date());
 
+		session.beginTransaction();
+		
+		session.createQuery("update RoomInfoFlowIdEntity set currentOpenId=? , Update_time_=? where processInstanceId=?")
+				.setString(0, assignee).setDate(1, new Date()).setString(2, delegateTask.getProcessInstanceId()).executeUpdate();
+
+        session.getTransaction().commit();
+		
 		FlowData flowData=(FlowData) map.get("flowData");
 		
 		List<BasicNameValuePair> reqParam = new ArrayList<BasicNameValuePair>();
@@ -87,7 +102,7 @@ public class CreateListener implements TaskListener{
 		reqParam.add(new BasicNameValuePair("keyword5_data", flowData.getKeyword5_data()));
 		reqParam.add(new BasicNameValuePair("remark_data", flowData.getRemark_data()));
 		
-	//	httpClient.doGet(requestUrl, reqParam);
+		httpClient.doGet(requestUrl, reqParam);
 		
 	}
 

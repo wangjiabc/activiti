@@ -15,6 +15,10 @@ http://www.springframework.org/schema/task http://www.springframework.org/schema
 	<!-- <task:annotation-driven /> -->
 	<!-- jndi方式 -->
 
+ <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+    	<property name="location" value="classpath:config.properties" />
+    </bean>
+
 	<!-- 配置数据源 -->
 	<bean name="dataSourceMybatis" class="com.alibaba.druid.pool.DruidDataSource"
 		init-method="init" destroy-method="close">
@@ -100,7 +104,6 @@ http://www.springframework.org/schema/task http://www.springframework.org/schema
 	<bean id="transactionManager"
 		class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
 		<property name="dataSource" ref="dataSourceMybatis" />
-		<property name="sessionFactory" ref="sessionFactory"></property>
 	</bean>
 
 	<!-- 注解方式配置事物 -->

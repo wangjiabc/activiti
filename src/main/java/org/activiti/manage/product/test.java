@@ -77,7 +77,7 @@ public class test extends FlowProduct{
 		flowData.setKeyword3_data(time2);
 		flowData.setKeyword4_data("正在申请");
 		flowData.setRemark_data("金额:" + jsonObject.getFloat("amount"));
-		flowData.setUrl("http://lzgfgs.com/voucher/mobile/1/flow/myTask.html");
+		flowData.setUrl("http://lzgfgs.com/voucher/mobile/flow/myTask.html");
 
 		Deliveran deliveran = new Deliveran();
 
@@ -162,7 +162,7 @@ public class test extends FlowProduct{
 			flowData.setKeyword3_data(sdf.format(neaten.getDate()));
 			flowData.setKeyword4_data("正在申请");
 			flowData.setRemark_data("金额:" + jsonObject.getFloat("amount"));
-			flowData.setUrl("http://lzgfgs.com/voucher/mobile/1/flow/myTask.html");
+			flowData.setUrl("http://lzgfgs.com/voucher/mobile/flow/myTask.html");
 
 			List<Deliveran> list = flowData.getDeliverans();
 
@@ -200,7 +200,7 @@ public class test extends FlowProduct{
 			flowData.setKeyword3_data(sdf.format(neaten.getDate()));
 			flowData.setKeyword4_data("正在申请");
 			flowData.setRemark_data("金额:" + jsonObject.getFloat("amount"));
-			flowData.setUrl("http://lzgfgs.com/voucher/mobile/1/flow/myTask.html");
+			flowData.setUrl("http://lzgfgs.com/voucher/mobile/flow/myTask.html");
 			
 			variables.put("input", input);
 

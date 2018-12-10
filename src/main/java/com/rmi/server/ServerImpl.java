@@ -52,7 +52,6 @@ import com.voucher.manage.model.Users;
 
 //继承该类， UnicastRemoteObject，暴露远程服务  
 public class ServerImpl implements Server {  
-
 	@Autowired  
     private RepositoryService repositoryService;  
     
@@ -90,20 +89,7 @@ public class ServerImpl implements Server {
 		Map map = new HashMap<>();
 		
 		org.json.JSONObject jsonObject=new org.json.JSONObject(variableData);
-		
-		RoomInfoFlowIdEntity roomInfoFlowIdEntity=new RoomInfoFlowIdEntity();
-		
-		roomInfoFlowIdEntity.setProcessInstanceId("");
-		roomInfoFlowIdEntity.setOpenId(userId);
-		roomInfoFlowIdEntity.setGuid(jsonObject.getString("guid"));
-		roomInfoFlowIdEntity.setApplicationUser(jsonObject.getString("username"));
-		roomInfoFlowIdEntity.setAddress(jsonObject.getString("address"));
-		roomInfoFlowIdEntity.setType(className);
-		roomInfoFlowIdEntity.setResult(0);
-		roomInfoFlowIdEntity.setDate(new Date());
-		roomInfoFlowIdEntity.setUpdate_time(new Date());
-		roomInfoFlowIdEntity.setState(1);
-		
+
 		// 用来设置启动流程的人员ID，引擎会自动把用户ID保存到activiti:initiator中
 		processEngineFactory.getIdentityService().setAuthenticatedUserId(userId);
 
@@ -111,13 +97,9 @@ public class ServerImpl implements Server {
 				processEngineFactory);
 		map.put("state", "流程启动成功");
 
-		roomInfoFlowIdEntity.setProcessInstanceId(pi.getProcessInstanceId());
-		
 		System.out.println("pi=" + pi);
 		
 		if (pi != null) {
-
-			processDaoImpl.save(roomInfoFlowIdEntity);
 			map.put("id", pi.getId());// 流程实例ID 101
 			map.put("state", "succeed");
 			map.put("流程定义ID:", pi.getProcessDefinitionId());// 流程定义ID
