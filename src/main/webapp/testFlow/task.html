@@ -85,6 +85,14 @@
                                 </div>
                             </div>
 						</div>
+						<div class="weui-cells__title">审核意见</div>
+    <div class="weui-cells weui-cells_form">
+            <div class="weui-cell">
+                <div class="weui-cell__bd">
+                  <textarea id="content" class="weui-textarea" rows="3" placeholder="请填写对该申请的审核说明"></textarea>
+                </div>
+            </div>
+        </div>
 					</form>
 		<div class="form-group">
             <div class="col-sm-5">
@@ -114,22 +122,23 @@
 	 $.ajax({
          type: "post",
          async: false,
-         url: "../test2/findMyTaskById.do",
+         url: "../flow/findMyTaskById.do",
          data: {
         	 id:taskId
          	}
 
          ,
-         success: function (data) {
+         success: function (text) {
+        	 var data=text.neaten;
 			console.log(data);
-            $("#guid").val(data.hidden_Neaten.guid);
-            $("#neaten_id").val(data.hidden_Neaten.neaten_id);
-            $("#neaten_name").val(data.hidden_Neaten.neaten_name);
-            $("#neaten_instance").val(data.hidden_Neaten.neaten_instance);
-            $("#area").val(data.hidden_Neaten.area);
-            $("#type").val(data.hidden_Neaten.type);
-            $("#amount").val(data.hidden_Neaten.amount);
-            $("#workUnit").val(data.hidden_Neaten.workUnit);
+            $("#guid").val(data.guid);
+            $("#neaten_id").val(data.neaten_id);
+            $("#neaten_name").val(data.neaten_name);
+            $("#neaten_instance").val(data.neaten_instance);
+            $("#area").val(data.area);
+            $("#type").val(data.type);
+            $("#amount").val(data.amount);
+            $("#workUnit").val(data.workUnit);
          }
      })
 	
@@ -138,6 +147,7 @@
         var clientInfo = new Object();
 
         clientInfo.guid = $("#guid").val().toString();
+        clientInfo.username = "ccc";
         clientInfo.neaten_id = $("#neaten_id").val().toString();
         clientInfo.neaten_name = $("#neaten_name").val().toString();
         clientInfo.neaten_instance = $("#neaten_instance").val().toString();
@@ -145,6 +155,7 @@
         clientInfo.type = $("#type").val().toString();
         clientInfo.amount = $("#amount").val().toString();
         clientInfo.workUnit = $("#workUnit").val().toString();
+        clientInfo.content=$("#content").val().toString();
         var clientInfodata = JSON.stringify(clientInfo);
         
         $.ajax({

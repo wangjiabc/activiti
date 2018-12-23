@@ -38,6 +38,8 @@ public interface Server {
 	
 	public Map selectById(String guid,int result,int limit,int offset);
 	
+	public Map selectByGuid(String guid);
+	
 	public Map selectByOpenId(@RequestParam String openId, @RequestParam Integer r, @RequestParam int limit,
 			@RequestParam int offset);
 	

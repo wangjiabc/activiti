@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>提交验收申请</title>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta name="viewport" content="width=device-width,height=device-height,inital-scale=1.0,maximum-scale=1.0,user-scalable=no" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black" />
+<meta name="format-detection" content="telephone=no" />
+<meta charset="utf-8" />
+ <script src="https://cdn.bootcss.com/jquery/1.12.4/jquery.min.js"></script>
+    <link rel="stylesheet" href="../1/css/weui.css"/>
+    <link rel="stylesheet" href="../1/css/example.css"/>
+    <script src="../../js/swiper.js"></script>
+    <script type="text/javascript" src="https://res.wx.qq.com/open/js/jweixin-1.0.0.js"></script>
+ 	<script src="../../js/jquery-weui.js"></script>
+ 	<link rel="stylesheet" href="../1/css/jquery-weui.css">
+ 	<script type="text/javascript" src="https://api.map.baidu.com/api?v=2.0&ak=cR98TwX2FnKTpANIOYhMYMot9a4ioxjc"></script>
+	<script type="text/javascript" src="https://api.map.baidu.com/library/CurveLine/1.5/src/CurveLine.min.js"></script>
+<style type="text/css">
+    body, html,#allmap {width: 100%;height: 70%;margin:0;font-family:"微软雅黑";}
+</style>
+
+</head>
+<body>
+
+  <div class="weui-cells weui-cells_form">
+            <div class="weui-cell">
+                <div class="weui-cell__hd"><label class="weui-label">资产地址</label></div>
+                <div id="address" class="weui-cell__bd">
+                </div>
+            </div>
+    </div>
+
+	<div class="weui-cells weui-cells_form">
+		<div class="weui-cell">
+			<div class="weui-cell__hd"><label class="weui-label">整改项目</label></div>
+			<div id="item" class="weui-cell__bd"></div>
+		</div>
+	</div>
+
+   	<div id="repair"><!-- 维修记录 -->
+	
+		<div class="weui-cells weui-cells_form">
+			<div class="weui-cell">
+				<div class="weui-cell__hd"><label class="weui-label">维修类型</label></div>
+				<div id="type" class="weui-cell__bd"></div>
+			</div>
+		</div>
+
+		<div class="weui-cells weui-cells_form">
+			<div class="weui-cell">
+				<div class="weui-cell__hd">
+					<label class="weui-label">维修面积</label>
+				</div>
+				<div class="weui-cell__bd">
+					<input id="area" type="number" class="weui-input" />
+				</div>
+			</div>
+		</div>
+
+		<div class="weui-cells weui-cells_form">
+			<div class="weui-cell">
+				<div class="weui-cell__hd">
+					<label class="weui-label">送审金额</label>
+				</div>
+				<div class="weui-cell__bd">
+					<input id="amount" type="number" class="weui-input" />
+				</div>
+			</div>
+		</div>
+		
+		<div class="weui-cells weui-cells_form">
+			<div class="weui-cell">
+				<div class="weui-cell__hd">
+					<label class="weui-label">审减金额</label>
+				</div>
+				<div class="weui-cell__bd">
+					<input id="amountTotal" type="number" class="weui-input" />
+				</div>
+			</div>
+		</div>
+		
+		<div class="weui-cells weui-cells_form">
+			<div class="weui-cell">
+				<div class="weui-cell__hd">
+					<label class="weui-label">审定金额</label>
+				</div>
+				<div class="weui-cell__bd">
+					<input id="auditingAmount" type="number" class="weui-input" />
+				</div>
+			</div>
+		</div>
+		
+		<div class="weui-cells weui-cells_form">
+			<div class="weui-cell">
+				<div class="weui-cell__hd">
+					<label class="weui-label">质保期(年)</label>
+				</div>
+				<div class="weui-cell__bd">
+					<input id="availabeLength" class="weui-input" />
+				</div>
+			</div>
+		</div>
+		
+		<div class="weui-cells weui-cells_form">
+			<div class="weui-cell">
+				<div class="weui-cell__hd">
+					<label class="weui-label">施工单位</label>
+				</div>
+				<div class="weui-cell__bd">
+					<input id="workUnit"  class="weui-input" />
+				</div>
+			</div>
+		</div>
+		
+
+	</div>
+   
+  <div class="weui-cells weui-cells_form">
+     <div class="weui-cell">
+        <div class="weui-cell__hd"><label class="weui-label">整改人员</label></div>
+        <div  class="weui-cell__bd">
+          <input id="principal" class="weui-input" />
+        </div>
+     </div>
+    </div>
+  
+
+  
+  <div class="weui-cells weui-cells_form">
+     <div class="weui-cell">
+        <div class="weui-cell__hd"><label class="weui-label">整改时间</label></div>
+        <div  class="weui-cell__bd">
+         <input id="happenTime" class="weui-input" type="date"/>
+        </div>
+     </div>
+    </div>
+
+  
+  <div class="weui-cells weui-cells_form">
+     <div class="weui-cell">
+        <div class="weui-cell__hd"><label class="weui-label">备注</label></div>
+        <div  class="weui-cell__bd">
+         <input id="remark" class="weui-input" />
+        </div>
+     </div>
+    </div>
+  
+    <div class="weui-cells__title">整改详情</div>
+    <div class="weui-cells weui-cells_form">
+            <div class="weui-cell">
+                <div class="weui-cell__bd">
+                  <textarea id="neaten_instance" class="weui-textarea" rows="3"></textarea>
+                </div>
+            </div>
+        </div>
+
+	 <div class="weui-cells weui-cells_form">
+           <div class="weui-cell">
+                <div class="weui-cell__hd"><label class="weui-label">申请人员</label></div>
+                <div id="username" class="weui-cell__bd">
+                </div>
+          </div>
+    </div>
+
+	<div class="weui-cells weui-cells_form"> 
+    </div>
+
+	<a href="javascript:;" id="save" class="weui-btn weui-btn_plain-primary">提交申请</a>
+	
+</body>
+
+<script type="text/javascript">
+  function getQueryString(name) {
+    var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)", "i");
+    var r = window.location.search.substr(1).match(reg);
+    if (r != null) return unescape(r[2]); return null;
+   }
+
+  var taskId=getQueryString("taskId");
+
+  var is_repair=1;
+  
+  console.log(item);
+    
+  var username;
+  
+  var neatenitem;
+  
+	function keyDown(e) {   		  
+	　   var keycode = e.which;   //取得对应的键值（数字）  	  
+	　   var realkey = String.fromCharCode(e.which); //取得代表改键的真正字符  
+	   var val = document.getElementById("input").value;
+	　   if(keycode==13){
+		   local.search(val);
+	　   }
+	 }     
+        		
+	
+
+	var type="排危工程";
+	
+	function gradeChange2(){ 
+	    var objS = document.getElementById("select2"); 
+	    var grade = objS.options[objS.selectedIndex].value; 
+	    console.log(objS.options[objS.selectedIndex]);
+	    progre=grade;
+		 if(progre==0){
+	    	  type="排危工程";
+	      }else if(progre==1){
+	    	  type="小修";
+	      }else if(progre==2){
+	    	  type="大中修";
+	      }else if(progre==3){
+	    	  type="其他";
+	      }
+	   }
+	
+	var addressValue;
+	
+	var xhm=new XMLHttpRequest();
+    xhm.open("GET","/voucher/mobile/register/userinfoByopenId.do?campusId=1",false);
+    xhm.setRequestHeader("Content-type","application/x-www-form-urlencoded");
+    xhm.send();
+    var obj=JSON.parse(xhm.responseText);
+
+    if(obj.name!=null)
+     $("#principal").val(obj.name);
+    var username=document.createElement("span");
+	username.innerHTML=obj.user_name;
+    $("#username").append(obj.name);
+    username=obj.name;
+    
+    $.ajax({
+        type: "POST",
+        url: "../../mobile/flow/findMyTaskById.do",
+        data: { "id":taskId},
+        dataType: "json",
+        error: function (request){
+     	   console.log(request);
+        },
+        success: function (text) {   
+     	   var obj=text.neaten;
+     	   
+     	   console.log(obj);
+             	 guid=obj.guid;
+             	  	  
+             	  var name=document.createElement("span");
+                  name.innerHTML=obj.name;
+                  $("#name").append(name);                 
+             	   
+             	  var neaten_name=obj.neaten_name;
+                  $("#neaten_name").val(neaten_name);                  
+				
+                var item=obj.neaten_item;
+				$("#item").append("<font color='#3366FF'>"+item+"</font>");
+				
+				 var time=actionTime(obj.happen_time);
+				 console.log(time);
+				 $("#happenTime").val(time);
+                  
+                  var time=actionTime(obj.date);
+                  var date=document.createElement("span");
+                  date.innerHTML=time;
+                  $("#date").append(date);
+                  
+                  var remark=obj.remark;
+                  $("#remark").val(remark);
+                  
+                  var principal=obj.principal;
+                  $("#principal").val(principal);
+                  
+                  var username=document.createElement("span");
+       		   	  username.innerHTML=obj.user_name;
+                  $("#userName").append(username);
+                  
+                  var neaten_instance=obj.neaten_instance;
+                  $("#neaten_instance").val(neaten_instance);
+                      
+                  var area=obj.area;
+                  $("#area").val(area);
+                  
+                  var amount=obj.amount;
+                  $("#amount").val(amount);
+                  
+                  var amountTotal=obj.amountTotal;
+                  $("#amountTotal").val(amountTotal);
+                  
+                  var auditingAmount=obj.auditingAmount;
+                  $("#auditingAmount").val(auditingAmount);
+                  
+                  var availabeLength=obj.availabeLength;
+                  $("#availabeLength").val(availabeLength);
+                  
+                  var workUnit=obj.workUnit;
+                  $("#workUnit").val(workUnit);
+                  
+                  var principal=obj.principal;
+                  $("#principal").val(principal);
+       
+                  var type=obj.type;
+                  var select2 = document.createElement("select");
+              	select2.setAttribute("id","select2");
+              	select2.setAttribute("onchange","gradeChange2()");
+
+              	var option2 = document.createElement("option");
+              	option2.innerHTML="排危工程";
+              	if(type=="排危工程"){
+              		option2.setAttribute("selected","selected");
+              	}
+              	option2.setAttribute("value",0);
+              	select2.appendChild(option2);		
+              	
+              	var option2 = document.createElement("option");
+              	option2.innerHTML="小修";
+              	option2.setAttribute("value",1);
+              	if(type=="小修"){
+              		option2.setAttribute("selected","selected");
+              	}
+              	select2.appendChild(option2);	
+
+              	var option2 = document.createElement("option");
+              	option2.innerHTML="大中修";
+              	option2.setAttribute("value",2);
+              	if(type=="大中修"){
+              		option2.setAttribute("selected","selected");
+              	}
+              	select2.appendChild(option2);
+              	
+              	var option2 = document.createElement("option");
+              	option2.innerHTML="其他";
+              	option2.setAttribute("value",3);
+              	if(type=="其他"){
+              		option2.setAttribute("selected","selected");
+              	}
+              	select2.appendChild(option2);
+              	
+              	select2.setAttribute("class","weui-input");
+              	$("#type").append(select2);	
+                  
+                guid=obj.guid;
+                  
+              	$.ajax({
+                    type: "POST",
+                    url: "/voucher/mobile/asset/getRoomInfoByGUID.do",
+                    data: { "guid":guid},
+                    dataType: "json",
+                    error: function (request){
+                 	   console.log(request);
+                    },
+                    success: function (text) {              	   
+                    	console.log(text);
+                  	   var obj=text.roomInfo;
+                  	   var imgs=text.fileBytes;
+               
+                          	   var guid=obj.guid;
+                         	  
+                          	 var address=document.createElement("span");
+                            	  address.innerHTML=obj.address;
+                               $("#address").append(address);
+                              
+                              var num=document.createElement("span");
+                              num.innerHTML=obj.num;
+                              $("#num").append(num);
+                              
+                               var region=document.createElement("span");
+                               region.innerHTML=obj.region;
+                               $("#region").append(region);
+                               
+                               
+                               var fareItem=document.createElement("span");
+                               fareItem.innerHTML=obj.fareItem;
+                               $("#fareItem").append(fareItem);
+
+                    	}
+                });
+        }
+    });
+
+		
+	function actionTime(value){
+  	    var date = new Date(value); 
+  	    Y = date.getFullYear() + '-';
+  	    M = (date.getMonth()+1 < 10 ? '0'+(date.getMonth()+1) : date.getMonth()+1) + '-';
+  	  	D = date.getDate()<10?'0'+date.getDate():date.getDate();
+  	    h = date.getHours() + ':';
+  	    m = date.getMinutes() + ':';
+  	    s = date.getSeconds(); 
+  		return Y+M+D;
+  	}
+	
+
+	
+        
+  //happenTime设置为当前时间
+	var timestamp=actionTime(Date.parse(new Date()));
+    console.log(timestamp);
+    $("#happenTime").val(timestamp); 
+  
+    $("#save").on("click",function(){
+        	    	  	
+        	var principal=$("#principal").val();
+        	var happenTime=$("#happenTime").val();
+        	var remark=$("#remark").val();
+        	var neaten_instance=$("#neaten_instance").val();
+
+        	var area=$("#area").val();
+        	var amount=$("#amount").val();
+        	var amountTotal=$("#amountTotal").val();
+        	var auditingAmount=$("#auditingAmount").val();
+        	var availabeLength=$("#availabeLength").val();
+        	var workUnit=$("#workUnit").val();
+        	
+
+        		var error="";
+				if(area==null||area==""){
+        			error="面积不能为空!";
+        		}else if(amount==null||amount==""){
+        			error="送审金额不能为空!";
+        		}else if(amountTotal==null||amountTotal==""){
+        			error="审减金额不能为空!";
+        		}else if(auditingAmount==null||auditingAmount==""){
+        			error="审定金额不能为空!";
+        		}else if(availabeLength==null||availabeLength==""){
+        			error="质保期不能为空!";
+        		}else if(neaten_instance==null||neaten_instance==""){    				
+        			error="请填写整改详情说明!";
+    			}
+            	
+        		
+        		if(error!=""){
+        			
+        			$.alert(error);
+        			
+        			return false;
+        		}
+        		        		
+        	
+        	console.log(item);
+        	
+        	var variableData = new Object();
+        	
+        	variableData.guid=guid;
+        	variableData.neatenitem=neatenitem;
+        	variableData.username=username;
+        	variableData.address=addressValue;
+        	variableData.happenTime=happenTime;
+        	variableData.principal=principal;
+        	variableData.remark=remark;
+        	variableData.neaten_instance=neaten_instance;
+        	variableData.type=type;
+        	variableData.area=area;
+        	variableData.amount=amount;
+        	variableData.amountTotal=amountTotal;
+        	variableData.auditingAmount=auditingAmount;
+        	variableData.availabeLength=availabeLength;
+        	variableData.workUnit=workUnit;
+        	
+        	var variable = JSON.stringify(variableData);
+        	
+        	console.log(variable);
+        	
+        	$.ajax({
+                type: "post",
+                async: false,
+                url: "../../mobile/flow/personalTask.do",
+                data: {
+                	
+                	variableData: variable,
+                	input:1,
+                	className:"neaten",
+                	taskId:taskId
+                	}
+
+                ,
+                success: function (data) {
+                	var data=JSON.parse(data);
+                	console.log(data);
+                    if (data.state == "failed") {
+                        alert("error");
+                        return false;
+                    } else {
+       
+                           alert("提交成功");
+                           history.go(-1);
+                        	
+                    	}
+                }
+            });
+    	
+
+    });
+    
+</script>

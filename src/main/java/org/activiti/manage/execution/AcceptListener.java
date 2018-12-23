@@ -1,44 +1,30 @@
 package org.activiti.manage.execution;
 
-import java.io.Serializable;
-import java.net.URLDecoder;
-import java.net.URLEncoder;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-import javax.annotation.Resource;
-
 import org.activiti.engine.delegate.DelegateExecution;
 import org.activiti.engine.delegate.ExecutionListener;
 import org.activiti.engine.impl.persistence.entity.TaskEntity;
 import org.activiti.manage.context.ConnectSession;
-import org.activiti.manage.context.DBUtils;
 import org.activiti.manage.tools.MyTestUtil;
 import org.apache.http.message.BasicNameValuePair;
 import org.hibernate.Session;
-import org.hibernate.SessionFactory;
 
 import com.rmi.server.entity.FlowData;
 import com.rmi.server.entity.Neaten;
 import com.rmi.server.entity.RoomInfoFlowIdEntity;
-import com.sun.org.glassfish.external.statistics.annotations.Reset;
 
 import common.HttpClient;
 
-public class EndListener implements ExecutionListener{
+public class AcceptListener implements ExecutionListener{
 	
 	private static final long serialVersionUID = 1L;
 
 	private static final String requestUrl = "http://127.0.0.1:8080/voucher/mobile/WechatSendMessage/send.do";
-	
-	private static final String upRoomNeateUrl = "http://127.0.0.1:8080/voucher/mobile/user/upRoomNeatenFlowById.do";
 	
 	private static HttpClient httpClient = new HttpClient();
 	
@@ -57,24 +43,7 @@ public class EndListener implements ExecutionListener{
 		Map taskMap=taskEntity.getActivityInstanceVariables();
 
 		MyTestUtil.print(taskMap);
-		/*
-		ExecutionEntity executionEntity=taskEntity.getExecution();
-		
-		List<IdentityLinkEntity> identityLinkEntity=executionEntity.getIdentityLinks();
-		
-		Iterator iterator=identityLinkEntity.iterator();
-		
-		int i=0;
-		
-		while (iterator.hasNext()) {
-			System.out.println("identityLinkEntity="+i);
-			MyTestUtil.print(iterator.next());
-			i++;
-		}
-		
-		String userId = identityLinkEntity.get(0).getUserId();
-		
-		*/
+
 		int input=(int) taskMap.get("input");
 		String userId =(String) taskMap.get("userId");
 		System.out.println("userId="+userId);
@@ -83,26 +52,7 @@ public class EndListener implements ExecutionListener{
 		SimpleDateFormat sdf = new SimpleDateFormat(" yyyy-MM-dd HH:mm:ss ");
 		String time = sdf.format(new Date());
 		
-		/*
-		String sql="update roominfo_flowid  set Result_='"+input+"', Update_time_='"+time+"'"
-				+ ",State_ = 0  where GUID_='"+neaten.getGUID()+"' "
-				+ " and ProcessInstanceId_='"+taskEntity.getProcessInstanceId()+"'";
-		
-		System.out.println("sql="+sql);
-		
-		Connection connection=DBUtils.getConnection();
-		
-		PreparedStatement prep = connection.prepareStatement(sql);  
-        int i= prep.executeUpdate(sql);
-   
-        if(i<1){
-        	throw new Exception();
-        }
-        */
-		
 		FlowData flowData=(FlowData) taskMap.get("flowData");
-						
-		String result="";
 
 		Session session=new ConnectSession().get();
 		
@@ -111,14 +61,14 @@ public class EndListener implements ExecutionListener{
 		roomInfoFlowIdEntity.setCurrentOpenId(taskEntity.getAssignee());
 		roomInfoFlowIdEntity.setResult(input);		
 		roomInfoFlowIdEntity.setUpdate_time(new Date());
-		roomInfoFlowIdEntity.setState(0);
+		roomInfoFlowIdEntity.setState(1);
 		
 		session.beginTransaction();
 		
 		int i=session.createQuery("update RoomInfoFlowIdEntity set currentOpenId=? , update_time=?,"
 				+ "state=? , result=? where processInstanceId=?")
 				.setString(0, taskEntity.getAssignee()).setDate(1, new Date())
-				.setInteger(2, 0).setInteger(3, input)
+				.setInteger(2, 1).setInteger(3, 2)
 				.setString(4, taskEntity.getProcessInstanceId()).executeUpdate();
 
 		if (i < 1) {
@@ -126,27 +76,6 @@ public class EndListener implements ExecutionListener{
 			throw new Exception();
 		}
 		
-		if(input==1){
-			result="已通过";
-		}else{
-			result="已拒绝";
-			
-			String guid=URLEncoder.encode(neaten.getGUID());
-			
-			List<BasicNameValuePair> reqParam = new ArrayList<BasicNameValuePair>();
-			reqParam.add(new BasicNameValuePair("guid", guid));
-			
-			httpClient.doGet(upRoomNeateUrl, reqParam);
-			
-			i=session.createQuery("delete RoomInfoFlowIdEntity where processInstanceId=?").setString(0, taskEntity.getProcessInstanceId()).executeUpdate();
-		       
-	        if(i<1){
-	        	session.getTransaction().rollback();
-	        	throw new Exception();
-	        }
-			
-		}
-
 		session.getTransaction().commit();
 
 		List<BasicNameValuePair> reqParam = new ArrayList<BasicNameValuePair>();
@@ -155,8 +84,8 @@ public class EndListener implements ExecutionListener{
 		reqParam.add(new BasicNameValuePair("Send_Type", "整改审批"));
 		reqParam.add(new BasicNameValuePair("url", "http://lzgfgs.com/voucher/mobile/1/flow/myTask.html"));
 		reqParam.add(new BasicNameValuePair("first_data", "审核时间:"+time));
-		reqParam.add(new BasicNameValuePair("keyword1_data", neaten.getNeaten_item() + "整改维修"));
-		reqParam.add(new BasicNameValuePair("keyword2_data", result));
+		reqParam.add(new BasicNameValuePair("keyword1_data", neaten.getNeaten_item() + "整改维修申请"));
+		reqParam.add(new BasicNameValuePair("keyword2_data", "维修申请方案已通过,请提交验收申请"));
 		reqParam.add(new BasicNameValuePair("keyword3_data", ""));
 		reqParam.add(new BasicNameValuePair("keyword4_data", ""));
 		reqParam.add(new BasicNameValuePair("keyword5_data", ""));

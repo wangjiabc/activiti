@@ -45,7 +45,7 @@
              	   var obj = data[i];
              	   
              	   var taskId=obj.id;
-             	   var li_1=addDiv(obj.assignee,obj.executionId,obj.id,obj.name,actionTime(obj.createTime));
+             	   var li_1=addDiv(obj.description,obj.executionId,obj.id,obj.name,actionTime(obj.createTime));
                     li_1.setAttribute("taskId",taskId);
              	   li_1.setAttribute("onclick","clickEvent('"+taskId+"');");
              	   $("#ul").append(li_1);
@@ -67,14 +67,8 @@
                div_1.setAttribute("class","single-mode");
               var div_1_1=document.createElement("div");
                div_1_1.setAttribute("class","img-left");
-              var img=document.createElement("img");
-              if(src!=null){
-
-               div_1_1.appendChild(img);
-              }else{
-
-                  div_1_1.appendChild(img); 
-              }
+              var img=document.createElement("div");
+              addSpan(div_1_1,src);
                div_1.appendChild(div_1_1);               
               var div_2=document.createElement("div");
                div_2.setAttribute("class","text-right");
@@ -100,7 +94,6 @@
                div_2_1_5.setAttribute("style","margin:2px 0px 2px 0px"); 
                
                div_2_1.appendChild(div_2_1_1);
-               div_2_1.appendChild(div_2_1_2);
                div_2_1.appendChild(div_2_1_3);
                div_2_1.appendChild(div_2_1_4);
                div_2_1.appendChild(div_2_1_5);

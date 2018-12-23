@@ -49,10 +49,10 @@ public class StartListener implements ExecutionListener{
 		roomInfoFlowIdEntity.setApplicationUser(neaten.getApplicationUser());
 		roomInfoFlowIdEntity.setAddress(neaten.getAddress());
 		roomInfoFlowIdEntity.setType(neaten.getType());
-		roomInfoFlowIdEntity.setResult(0);
+		roomInfoFlowIdEntity.setResult(3);
 		roomInfoFlowIdEntity.setDate(new Date());
 		roomInfoFlowIdEntity.setUpdate_time(new Date());
-		roomInfoFlowIdEntity.setState(1);
+		roomInfoFlowIdEntity.setState(3);
 
 		session.beginTransaction();
 		

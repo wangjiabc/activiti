@@ -10,15 +10,21 @@ import java.util.Map;
 import org.activiti.engine.HistoryService;
 import org.activiti.engine.ProcessEngineConfiguration;
 import org.activiti.engine.runtime.ProcessInstance;
+import org.activiti.engine.task.Task;
+import org.activiti.manage.context.ConnectSession;
 import org.activiti.manage.factory.FlowProduct;
 import org.activiti.manage.tools.MyTestUtil;
+import org.hibernate.Session;
 import org.json.JSONObject;
 
 import com.rmi.server.entity.Deliveran;
 import com.rmi.server.entity.FlowData;
 import com.rmi.server.entity.Neaten;
+import com.rmi.server.entity.RoomInfoFlowIdEntity;
 
 public class neaten extends FlowProduct{
+	
+	Session session=new ConnectSession().get();
 	
 	@Override
 	public ProcessInstance start(String userId,String processDefinitionKey, String variableData,
@@ -58,8 +64,6 @@ public class neaten extends FlowProduct{
 		neaten.setType(jsonObject.getString("type"));
 		neaten.setArea(jsonObject.getFloat("area"));
 		neaten.setAmount(jsonObject.getFloat("amount"));
-		neaten.setAmountTotal(jsonObject.getFloat("amountTotal"));
-		neaten.setAuditingAmount(jsonObject.getFloat("auditingAmount"));
 		neaten.setAvailabeLength(jsonObject.getString("availabeLength"));
 		neaten.setWorkUnit(jsonObject.getString("workUnit"));
 		neaten.setCheckItemDate(jsonObject.getString("checkItemDate"));
@@ -119,14 +123,37 @@ public class neaten extends FlowProduct{
 		
 		String userId=(String) taskMap.get("userId");
 		
+		System.out.println("userId="+userId);
+		
 		String path;
 		
-		System.out.println("currentUserId="+currentUserId);
+		FlowData flowData=(FlowData) processEngineFactory.getTaskService().getVariable(taskId, "flowData");
 		
-		if(userId.equals(currentUserId)){
-			path="/mobile/flow/reTask";
-		}else{
-			path="/mobile/flow/task";
+		Task task=processEngineFactory.getTaskService().createTaskQuery().singleResult();
+
+		String processInstanceId=task.getProcessInstanceId();
+
+		List<RoomInfoFlowIdEntity> list=session.createQuery("from RoomInfoFlowIdEntity where processInstanceId=? ")
+				.setString(0, processInstanceId).list();
+		
+		RoomInfoFlowIdEntity roomInfoFlowIdEntity=list.get(0);
+		
+		int result=roomInfoFlowIdEntity.getResult();
+		
+		System.out.println("result="+result);
+		
+		if (result > 2) {
+			if (userId.equals(currentUserId)) {
+				path = "/mobile/flow/reTask";
+			} else {
+				path = "/mobile/flow/task";
+			}
+		} else {
+			if (userId.equals(currentUserId)) {
+				path = "/mobile/flow/acceptPut";
+			} else {
+				path = "/mobile/flow/acceptTask";
+			}
 		}
 		
 		return path;
@@ -159,63 +186,143 @@ public class neaten extends FlowProduct{
 		System.out.println("currentUserId=" + currentUserId);
 		System.out.println("userId=" + taskMap.get("userId"));
 
-		if (!currentUserId.equals(taskMap.get("userId"))) {
+		Task task=processEngineFactory.getTaskService().createTaskQuery().singleResult();
 
-			flowData.setTemplate_Id("9iK_AqQpwEZPew9-TgMAy1zyuBGfB1pbuZ3DBGuEXz0");
-			flowData.setKeyword2_data(neaten.getNeaten_item() + "整改维修");
-			flowData.setKeyword3_data(sdf.format(neaten.getDate()));
-			flowData.setKeyword4_data("正在申请");
-			flowData.setRemark_data("金额:" + jsonObject.getFloat("amount"));
-			flowData.setUrl("http://lzgfgs.com/voucher/mobile/1/flow/myTask.html");
-
-			List<Deliveran> list = flowData.getDeliverans();
-
-			Deliveran deliveran = new Deliveran();
-
-			System.out.println("content=" + jsonObject.getString("content"));
-			System.out.println("username=" + jsonObject.getString("username"));
-
-			deliveran.setContent(jsonObject.getString("content"));
-			deliveran.setUserName(jsonObject.getString("username"));
-			deliveran.setDate(date);
-			MyTestUtil.print(deliveran);
-			list.add(deliveran);
-
-			flowData.setDeliverans(list);
-
-			variables.put("input", input);
-
-			variables.put("flowData", flowData);
-			MyTestUtil.print(flowData);
-			MyTestUtil.print(variables);
-			System.out.println("variablesuserid=" + taskMap.get("userId"));
-
-		} else {
-
-			neaten.setType(jsonObject.getString("type"));
-			neaten.setNeaten_instance(jsonObject.getString("neaten_instance"));
-			neaten.setPrincipal(jsonObject.getString("principal"));
-			neaten.setRemark(jsonObject.getString("remark"));
-			neaten.setArea(jsonObject.getFloat("area"));
-			neaten.setAmount(jsonObject.getFloat("amount"));
-			neaten.setAmountTotal(jsonObject.getFloat("amountTotal"));
-			neaten.setAuditingAmount(jsonObject.getFloat("auditingAmount"));
-			neaten.setAvailabeLength(jsonObject.getString("availabeLength"));
-			neaten.setWorkUnit(jsonObject.getString("workUnit"));
-
-			flowData.setTemplate_Id("9iK_AqQpwEZPew9-TgMAy1zyuBGfB1pbuZ3DBGuEXz0");
-			flowData.setKeyword2_data(neaten.getNeaten_item() + "整改维修");
-			flowData.setKeyword3_data(sdf.format(neaten.getDate()));
-			flowData.setKeyword4_data("正在申请");
-			flowData.setRemark_data("金额:" + jsonObject.getFloat("amount"));
-			flowData.setUrl("http://lzgfgs.com/voucher/mobile/flow/myTask.html");
+		String processInstanceId=task.getProcessInstanceId();
+		
+		List<RoomInfoFlowIdEntity> RoomInfoFlowIdList=session.createQuery("from RoomInfoFlowIdEntity where processInstanceId=? ")
+				.setString(0, processInstanceId).list();
+		
+		RoomInfoFlowIdEntity roomInfoFlowIdEntity=RoomInfoFlowIdList.get(0);
+		
+		int result=roomInfoFlowIdEntity.getResult();
+		
+		if (result > 2) {
 			
-			variables.put("input", input);
+			if (!currentUserId.equals(taskMap.get("userId"))) {
 
-			variables.put("neaten", neaten);
+				flowData.setTemplate_Id("9iK_AqQpwEZPew9-TgMAy1zyuBGfB1pbuZ3DBGuEXz0");
+				flowData.setKeyword2_data(neaten.getNeaten_item() + "整改维修");
+				flowData.setKeyword3_data(sdf.format(neaten.getDate()));
+				flowData.setKeyword4_data("正在申请");
+				flowData.setRemark_data("金额:" + jsonObject.getFloat("amount"));
+				flowData.setUrl("http://lzgfgs.com/voucher/mobile/1/flow/myTask.html");
+
+				List<Deliveran> list = flowData.getDeliverans();
+
+				Deliveran deliveran = new Deliveran();
+
+				System.out.println("content=" + jsonObject.getString("content"));
+				System.out.println("username=" + jsonObject.getString("username"));
+
+				deliveran.setContent(jsonObject.getString("content"));
+				deliveran.setUserName(jsonObject.getString("username"));
+				deliveran.setDate(date);
+				MyTestUtil.print(deliveran);
+				list.add(deliveran);
+
+				flowData.setDeliverans(list);
+
+				variables.put("input", input);
+
+				variables.put("flowData", flowData);
+				MyTestUtil.print(flowData);
+				MyTestUtil.print(variables);
+				System.out.println("variablesuserid=" + taskMap.get("userId"));
+
+			} else {
+
+				neaten.setType(jsonObject.getString("type"));
+				neaten.setNeaten_instance(jsonObject.getString("neaten_instance"));
+				neaten.setPrincipal(jsonObject.getString("principal"));
+				neaten.setRemark(jsonObject.getString("remark"));
+				neaten.setArea(jsonObject.getFloat("area"));
+				neaten.setAmount(jsonObject.getFloat("amount"));
+				neaten.setAvailabeLength(jsonObject.getString("availabeLength"));
+				neaten.setWorkUnit(jsonObject.getString("workUnit"));
+
+				flowData.setTemplate_Id("9iK_AqQpwEZPew9-TgMAy1zyuBGfB1pbuZ3DBGuEXz0");
+				flowData.setFirst_data(neaten.getAddress() + "维修申请");
+				flowData.setKeyword2_data(neaten.getNeaten_item() + "维修申请");
+				flowData.setKeyword3_data(sdf.format(neaten.getDate()));
+				flowData.setKeyword4_data("正在申请");
+				flowData.setRemark_data("金额:" + jsonObject.getFloat("amount"));
+				flowData.setUrl("http://lzgfgs.com/voucher/mobile/flow/myTask.html");
+
+				variables.put("input", input);
+
+				variables.put("neaten", neaten);
+
+				variables.put("flowData", flowData);
+
+			}
 			
-			variables.put("flowData", flowData);
+		}else{
+			
+			// 流程添加标题
+			processEngineFactory.getRuntimeService().setProcessInstanceName(processInstanceId, neaten.getAddress() + "验收申请");
+			
+			if (!currentUserId.equals(taskMap.get("userId"))) {
 
+				flowData.setTemplate_Id("9iK_AqQpwEZPew9-TgMAy1zyuBGfB1pbuZ3DBGuEXz0");
+				flowData.setFirst_data(neaten.getAddress() + "验收申请");
+				flowData.setKeyword2_data(neaten.getNeaten_item() + "维修验收申请");
+				flowData.setKeyword3_data(sdf.format(neaten.getDate()));
+				flowData.setKeyword4_data("正在申请");
+				flowData.setRemark_data("金额:" + jsonObject.getFloat("amount"));
+				flowData.setUrl("http://lzgfgs.com/voucher/mobile/1/flow/myTask.html");
+
+				List<Deliveran> list = flowData.getDeliverans();
+
+				Deliveran deliveran = new Deliveran();
+
+				System.out.println("content=" + jsonObject.getString("content"));
+				System.out.println("username=" + jsonObject.getString("username"));
+
+				deliveran.setContent(jsonObject.getString("content"));
+				deliveran.setUserName(jsonObject.getString("username"));
+				deliveran.setDate(date);
+				MyTestUtil.print(deliveran);
+				list.add(deliveran);
+
+				flowData.setDeliverans(list);
+
+				variables.put("input", input);
+
+				variables.put("flowData", flowData);
+				MyTestUtil.print(flowData);
+				MyTestUtil.print(variables);
+				System.out.println("variablesuserid=" + taskMap.get("userId"));
+
+			} else {
+
+				neaten.setType(jsonObject.getString("type"));
+				neaten.setNeaten_instance(jsonObject.getString("neaten_instance"));
+				neaten.setPrincipal(jsonObject.getString("principal"));
+				neaten.setRemark(jsonObject.getString("remark"));
+				neaten.setArea(jsonObject.getFloat("area"));
+				neaten.setAmount(jsonObject.getFloat("amount"));
+				neaten.setAmountTotal(jsonObject.getFloat("amountTotal"));
+				neaten.setAuditingAmount(jsonObject.getFloat("auditingAmount"));
+				neaten.setAvailabeLength(jsonObject.getString("availabeLength"));
+				neaten.setWorkUnit(jsonObject.getString("workUnit"));
+
+				flowData.setTemplate_Id("9iK_AqQpwEZPew9-TgMAy1zyuBGfB1pbuZ3DBGuEXz0");
+				flowData.setFirst_data(neaten.getAddress() + "验收申请");
+				flowData.setKeyword2_data(neaten.getNeaten_item() + "维修验收申请");
+				flowData.setKeyword3_data(sdf.format(neaten.getDate()));
+				flowData.setKeyword4_data("正在申请");
+				flowData.setRemark_data("金额:" + jsonObject.getFloat("amountTotal"));
+				flowData.setUrl("http://lzgfgs.com/voucher/mobile/flow/myTask.html");
+
+				variables.put("input", input);
+
+				variables.put("neaten", neaten);
+
+				variables.put("flowData", flowData);
+
+			}
+			
 		}
 		
 		if(input==2){

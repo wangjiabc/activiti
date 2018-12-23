@@ -86,6 +86,26 @@ public class ProcessDaoImpl {
 	}
 	
 	@Transactional
+	public Map selectByGuid(String guid) {
+		// TODO Auto-generated method stub
+		Session session = sessionFactory.getCurrentSession();
+
+		List<RoomInfoFlowIdEntity> list = session
+				.createQuery("from RoomInfoFlowIdEntity where guid=?")
+				.setString(0, guid).list();
+
+		long total = (long) session.createQuery("select count(*) from RoomInfoFlowIdEntity where guid=?")
+				.setString(0, guid).uniqueResult();
+
+		Map map = new HashMap<>();
+
+		map.put("rows", list);
+		map.put("total", total);
+
+		return map;
+	}
+	
+	@Transactional
     public Map selectByOpenId(String openId,int result,int limit,int offset){
 
         Session session=sessionFactory.getCurrentSession();

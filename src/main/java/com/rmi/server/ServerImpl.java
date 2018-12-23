@@ -476,6 +476,12 @@ public class ServerImpl implements Server {
 		 
 	 }
 	
+	@Override
+	public Map selectByGuid(String guid) {
+		// TODO Auto-generated method stub
+		return processDaoImpl.selectByGuid(guid);
+	}
+	 
 	public Map selectByOpenId(@RequestParam String openId, @RequestParam Integer result, @RequestParam int limit,
 			@RequestParam int offset){
 
