@@ -10,12 +10,24 @@ public class Deliveran implements Serializable{
 	 */
 	private static final long serialVersionUID = 1L;
 	
+	private String name;
+	
 	private String content;
 	
 	private String userName;
+
+	private Integer result;
 	
 	private Date date;
 
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+	
 	public String getContent() {
 		return content;
 	}
@@ -38,6 +50,14 @@ public class Deliveran implements Serializable{
 
 	public void setDate(Date date) {
 		this.date = date;
+	}
+
+	public Integer getResult() {
+		return result;
+	}
+
+	public void setResult(Integer result) {
+		this.result = result;
 	}
 	
 	

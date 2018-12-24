@@ -153,7 +153,7 @@ public class EndListener implements ExecutionListener{
 		reqParam.add(new BasicNameValuePair("openId", userId));
 		reqParam.add(new BasicNameValuePair("Template_Id", "M_TnyO6o3U6bImli9xsfXhL-rCskh9YYaSzCLWMdbJM"));
 		reqParam.add(new BasicNameValuePair("Send_Type", "整改审批"));
-		reqParam.add(new BasicNameValuePair("url", "http://lzgfgs.com/voucher/mobile/1/flow/myTask.html"));
+		reqParam.add(new BasicNameValuePair("url", "http://lzgfgs.com/voucher/mobile/flow/myTask.html"));
 		reqParam.add(new BasicNameValuePair("first_data", "审核时间:"+time));
 		reqParam.add(new BasicNameValuePair("keyword1_data", neaten.getNeaten_item() + "整改维修"));
 		reqParam.add(new BasicNameValuePair("keyword2_data", result));

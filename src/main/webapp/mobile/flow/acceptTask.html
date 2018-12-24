@@ -93,11 +93,18 @@
                 </div>
             </div>
         </div>
-					</form>
+        
+        	<div class="container" id="container">		
+		<div class="cell">
+			<div class="weui-cells__title">审核详情</div>
+			<div class="weui-cells weui-cells_checkbox" id="deliverans"></div>
+		</div>			
+	</div>
+			</form>
+			
 		<div class="form-group">
             <div class="col-sm-5">
                 <button class="mybtn mybtn-medium mybtn-green w100" id="submit" onclick="addInfo(1);">同意</button>
-                <button class="mybtn mybtn-medium mybtn-green w100" id="submit2" onclick="addInfo(0);">拒绝</button>
                 <button class="mybtn mybtn-medium mybtn-green w100" id="submit3" onclick="addInfo(2);">退回重新提交</button>
             </div>
         </div>
@@ -139,10 +146,84 @@
             $("#type").val(data.type);
             $("#amount").val(data.amount);
             $("#workUnit").val(data.workUnit);
+            
+            var flowData=text.flowData;
+            var deliverans=flowData.deliverans;
+            console.log(deliverans);
+            for(var i=0;i<deliverans.length;i++){
+            	addDiv(i,deliverans[i].name,deliverans[i].content,deliverans[i].userName,deliverans[i].result,deliverans[i].date);
+            }
          }
      })
 	
-	
+	function addDiv(i,name,content,userName,result,date){
+  	  var label=document.createElement("div");
+  	  label.setAttribute("class","weui-cells");
+  	  var div_0=document.createElement("div");
+  	  div_0.setAttribute("class","weui-cells__title");
+  	  var p=document.createElement("p");
+  	  p.setAttribute("class","weui-cell__bd");
+  	  p.innerHTML=(i+1)+"流程名称:"+name;
+  	  div_0.appendChild(p);
+  	  var div_1=document.createElement("div");
+  	  div_1.setAttribute("class","weui-cells__title");
+  	  var p=document.createElement("p");
+  	  p.setAttribute("class","weui-cell__bd");
+  	  p.innerHTML="审批意见:"+content;
+  	  if(content!=null&&content!="")
+  	  	div_1.appendChild(p);
+  	  var div_2=document.createElement("div");
+  	  div_2.setAttribute("class","weui-cells__title");
+  	  var p=document.createElement("p");
+  	  p.setAttribute("class","weui-cell__bd");
+  	  p.innerHTML="执行人:"+userName;
+  	  div_2.appendChild(p);
+  	  var div_3=document.createElement("div");
+  	  div_3.setAttribute("class","weui-cells__title");
+  	  var p=document.createElement("p");
+  	  p.setAttribute("class","weui-cell__bd");
+  	  var course;
+  	  if(result==1){
+  		  course="同意";
+  	  }else if(result==2){
+  		  course="退回";
+  	  }else if(result==3){
+  		  course="重新提交";
+  	  }else if(result==0){
+  		  course="拒绝";
+  	  }else{
+  		  course="拒绝";
+  	  }
+  	  p.innerHTML="结果:"+course;
+  	  if(course!=3)
+	  	div_3.appendChild(p);
+  	  var div_4=document.createElement("div");
+  	  div_4.setAttribute("class","weui-cells__title");
+  	  var p=document.createElement("p");
+  	  p.setAttribute("class","weui-cell__bd");
+  	  p.innerHTML="时间:"+actionTime(date);
+  	  div_4.appendChild(p);
+  	  
+  	  label.appendChild(div_0);
+  	  label.appendChild(div_1);
+  	  label.appendChild(div_3);
+  	  label.appendChild(div_2);   	  
+  	  label.appendChild(div_4);
+  	  
+  	  $("#deliverans").append(label);
+    } 
+    
+	 function actionTime(value){
+	        var date = new Date(value);
+	        Y = date.getFullYear() + '-';
+	        M = (date.getMonth()+1 < 10 ? '0'+(date.getMonth()+1) : date.getMonth()+1) + '-';
+	        D = date.getDate() + ' ';
+	        h = date.getHours() + ':';
+	        m = date.getMinutes() + ':';
+	        s = date.getSeconds();
+	        return Y+M+D+h+m+s;
+	    } 
+	 
 	function addInfo(input) {
         var clientInfo = new Object();
 

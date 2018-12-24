@@ -11,8 +11,10 @@
     <title>提交验收申请</title>
 </head>
 
+<body>
 
-          <form  id="userinfo-form">
+
+	<form  id="userinfo-form">
                         <div class="row">
                             <div class="form-group col-sm-3">
                                 <label class="col-sm-4 control-label">GUID</label>
@@ -106,17 +108,27 @@
                                 </div>
                             </div>
 						</div>
-					</form>
-		<div class="form-group">
-            <div class="col-sm-5">
-                <button class="mybtn mybtn-medium mybtn-green w100" id="submit3" onclick="addInfo(1);">重新提交</button>
+	<div class="weui-cells__title">审核意见</div>
+    <div class="weui-cells weui-cells_form">
+            <div class="weui-cell">
+                <div class="weui-cell__bd">
+                  <textarea id="content" class="weui-textarea" rows="3" placeholder="请填写对该申请的审核说明"></textarea>
+                </div>
             </div>
         </div>
-		<div class="form-group">
-            <div class="col-sm-5">
-                <button class="mybtn mybtn-medium mybtn-green w100" type="button" onclick="history.back();" class="btn">返回</button>
-            </div>
-        </div>
+		
+	<div class="container" id="container">		
+		<div class="cell">
+			<div class="weui-cells__title">审核详情</div>
+			<div class="weui-cells weui-cells_checkbox" id="deliverans"></div>
+		</div>			
+	</div>
+	
+		</form>
+
+	<a href="javascript:;" id="save" class="weui-btn weui-btn_plain-primary">提交申请</a>
+	
+</body>
 					
 <script type="text/javascript">	
 
@@ -129,19 +141,117 @@
 
 	var taskId=getQueryString("taskId");
 	console.log(taskId);
+
+	$.ajax({
+        type: "post",
+        async: false,
+        url: "../flow/findMyTaskById.do",
+        data: {
+       	 id:taskId
+        	}
+
+        ,
+        success: function (text) {
+       	 var data=text.neaten;
+			console.log(data);
+          $("#guid").val(data.guid);
+           $("#neaten_id").val("eeeeee");
+           $("#neaten_name").val(data.neaten_name);
+           $("#neaten_instance").val(data.neaten_instance);
+           $("#area").val(data.area);
+           $("#type").val(data.type);
+          // $("#guid").val(data.amount);
+           $("#workUnit").val(data.workUnit);
+           
+           var flowData=text.flowData;
+           var deliverans=flowData.deliverans;
+           console.log(deliverans);
+           for(var i=0;i<deliverans.length;i++){
+           	addDiv(i,deliverans[i].name,deliverans[i].content,deliverans[i].userName,deliverans[i].result,deliverans[i].date);
+           }
+        }
+    })
 	
+    function addDiv(i,name,content,userName,result,date){
+  	  var label=document.createElement("div");
+  	  label.setAttribute("class","weui-cells");
+  	  var div_0=document.createElement("div");
+  	  div_0.setAttribute("class","weui-cells__title");
+  	  var p=document.createElement("p");
+  	  p.setAttribute("class","weui-cell__bd");
+  	  p.innerHTML=(i+1)+"流程名称:"+name;
+  	  div_0.appendChild(p);
+  	  var div_1=document.createElement("div");
+  	  div_1.setAttribute("class","weui-cells__title");
+  	  var p=document.createElement("p");
+  	  p.setAttribute("class","weui-cell__bd");
+  	  p.innerHTML="审批意见:"+content;
+  	  if(content!=null&&content!="")
+  	  	div_1.appendChild(p);
+  	  var div_2=document.createElement("div");
+  	  div_2.setAttribute("class","weui-cells__title");
+  	  var p=document.createElement("p");
+  	  p.setAttribute("class","weui-cell__bd");
+  	  p.innerHTML="执行人:"+userName;
+  	  div_2.appendChild(p);
+  	  var div_3=document.createElement("div");
+  	  div_3.setAttribute("class","weui-cells__title");
+  	  var p=document.createElement("p");
+  	  p.setAttribute("class","weui-cell__bd");
+  	  var course;
+  	  if(result==1){
+  		  course="同意";
+  	  }else if(result==2){
+  		  course="退回";
+  	  }else if(result==3){
+  		  course="重新提交";
+  	  }else if(result==0){
+  		  course="拒绝";
+  	  }else{
+  		  course="拒绝";
+  	  }
+  	  p.innerHTML="结果:"+course;
+  	  if(course!=3)
+	  	div_3.appendChild(p);
+  	  var div_4=document.createElement("div");
+  	  div_4.setAttribute("class","weui-cells__title");
+  	  var p=document.createElement("p");
+  	  p.setAttribute("class","weui-cell__bd");
+  	  p.innerHTML="时间:"+actionTime(date);
+  	  div_4.appendChild(p);
+  	  
+  	  label.appendChild(div_0);
+  	  label.appendChild(div_1);
+  	  label.appendChild(div_3);
+  	  label.appendChild(div_2);   	  
+  	  label.appendChild(div_4);
+  	  
+  	  $("#deliverans").append(label);
+    } 
+    
+	 function actionTime(value){
+	        var date = new Date(value);
+	        Y = date.getFullYear() + '-';
+	        M = (date.getMonth()+1 < 10 ? '0'+(date.getMonth()+1) : date.getMonth()+1) + '-';
+	        D = date.getDate() + ' ';
+	        h = date.getHours() + ':';
+	        m = date.getMinutes() + ':';
+	        s = date.getSeconds();
+	        return Y+M+D+h+m+s;
+	    } 
+    
 	 $.ajax({
          type: "post",
          async: false,
-         url: "../../flow/findMyTaskById.do",
+         url: "../flow/findMyTaskById.do",
          data: {
         	 id:taskId
          	}
 
          ,
-         success: function (data) {
-			console.log(data);
-			$("#guid").val(data.guid);
+         success: function (text) {
+			console.log(text.neaten);
+			var data=text.neaten;
             $("#neaten_id").val(data.neaten_id);
             $("#neaten_name").val(data.neaten_name);
             $("#neaten_instance").val(data.neaten_instance);
@@ -153,48 +263,104 @@
      })
 	
 	
-	function addInfo(input) {
-        var clientInfo = new Object();
+      $("#save").on("click",function(){
+        	    	  	
+        	var principal=$("#principal").val();
+        	var happenTime=$("#happenTime").val();
+        	var remark=$("#remark").val();
+        	var neaten_instance=$("#neaten_instance").val();
 
-        clientInfo.guid = $("#guid").val().toString();
-        clientInfo.neaten_id = $("#neaten_id").val().toString();
-        clientInfo.neaten_name = $("#neaten_name").val().toString();
-        clientInfo.neaten_instance = $("#neaten_instance").val().toString();
-        clientInfo.area = $("#area").val().toString();
-        clientInfo.type = $("#type").val().toString();
-        clientInfo.amount = $("#amount").val().toString();
-        clientInfo.amount = $("#amountTotal").val().toString();
-        clientInfo.amount = $("#auditingAmount").val().toString();
-        clientInfo.workUnit = $("#workUnit").val().toString();
-        var clientInfodata = JSON.stringify(clientInfo);
-        
-        $.ajax({
-            type: "post",
-            async: false,
-            url: "../../flow/personalTask.do",
-            data: {
-            	
-            	variableData: clientInfodata,
-            	input:input,
-            	className:"neaten",
-            	taskId:taskId
-            	}
+        	var area=$("#area").val();
+        	var amount=$("#amount").val();
+        	var amountTotal=$("#amountTotal").val();
+        	var auditingAmount=$("#auditingAmount").val();
+        	var availabeLength=$("#availabeLength").val();
+        	var workUnit=$("#workUnit").val();
+        	
 
-            ,
-            success: function (data) {
-            	console.log(data);
-                if (data.state == "failed") {
-                    alert("error");
-                    return false;
-                } else {
-   
-                       alert("添加成功");
-                       history.go(-1);
-                    	
+        		var error="";
+				if(area==null||area==""){
+        			error="面积不能为空!";
+        		}else if(amount==null||amount==""){
+        			error="送审金额不能为空!";
+        		}
+        		/*
+        		else if(amountTotal==null||amountTotal==""){
+        			error="审减金额不能为空!";
+        		}else if(auditingAmount==null||auditingAmount==""){
+        			error="审定金额不能为空!";
+        		}else if(availabeLength==null||availabeLength==""){
+        			error="质保期不能为空!";
+        		}else if(neaten_instance==null||neaten_instance==""){    				
+        			error="请填写整改详情说明!";
+    			}
+            	*/
+        		
+        		if(error!=""){
+        			
+        			alert(error);
+        			
+        			return false;
+        		}
+        		        		
+        	
+        	var clientInfo = new Object();
+        	
+    
+            clientInfo.address = "address";
+            clientInfo.neatenitem = "";
+            clientInfo.happenTime = "2018-1-5";
+            clientInfo.principal = "principal";
+            clientInfo.remark = "remark";
+            clientInfo.addComp = "";
+            clientInfo.lng = 10.232;
+            clientInfo.lat = 28.89589;
+            clientInfo.availabeLength = "1";
+            clientInfo.checkItemDate = "";
+            clientInfo.username = "ccc";
+            clientInfo.neaten_id = "wewe";
+            clientInfo.neaten_name = "qwqwqw";
+            clientInfo.neaten_instance = $("#neaten_instance").val().toString();
+            clientInfo.area = $("#area").val().toString();
+            clientInfo.amountTotal="123";
+            clientInfo.auditingAmount="132";
+            clientInfo.type = "jiji";
+            clientInfo.amount = $("#amount").val().toString();
+            clientInfo.workUnit = $("#workUnit").val().toString();
+            console.log(clientInfo);
+            var clientInfodata = JSON.stringify(clientInfo);
+        	console.log(clientInfodata);
+        	
+        	
+        	$.ajax({
+                type: "post",
+                async: false,
+                url: "../flow/personalTask.do",
+                data: {
+                	
+                	variableData: clientInfodata,
+                	input:1,
+                	className:"neaten",
+                	taskId:taskId
                 	}
-            }
-        })
 
-        
-	}
+                ,
+                success: function (data) {
+
+                	console.log(data);
+                    if (data.state == "failed") {
+                        alert("error");
+                        return false;
+                    } else {
+       
+                           alert("提交成功");
+                           history.go(-1);
+                        	
+                    	}
+                }
+            });
+    	
+
+    });
+ 
 </script>

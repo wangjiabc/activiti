@@ -100,6 +100,17 @@
         var clientInfo = new Object();
 
         clientInfo.guid = $("#guid").val().toString();
+        clientInfo.address = "address";
+        clientInfo.neatenitem = "";
+        clientInfo.happenTime = "2018-1-5";
+        clientInfo.principal = "principal";
+        clientInfo.remark = "remark";
+        clientInfo.addComp = "";
+        clientInfo.lng = 10.232;
+        clientInfo.lat = 28.89589;
+        clientInfo.availabeLength = "1";
+        clientInfo.checkItemDate = "";
+        clientInfo.username = "ccc";
         clientInfo.neaten_id = $("#neaten_id").val().toString();
         clientInfo.neaten_name = $("#neaten_name").val().toString();
         clientInfo.neaten_instance = $("#neaten_instance").val().toString();
@@ -113,7 +124,7 @@
             async: false,
             url: "../flow/start.do",
             data: {
-            	processDefinitionKey:"process",
+            	processDefinitionKey:"neaten",
             	userId:"ccc",
             	variableData: clientInfodata,
             	className:"neaten"

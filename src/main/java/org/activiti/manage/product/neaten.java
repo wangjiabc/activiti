@@ -85,7 +85,7 @@ public class neaten extends FlowProduct{
 
 		Deliveran deliveran = new Deliveran();
 
-		deliveran.setContent("提交申请");
+		deliveran.setName("提交申请");
 		deliveran.setUserName(jsonObject.getString("username"));
 		deliveran.setDate(date);
 
@@ -206,19 +206,18 @@ public class neaten extends FlowProduct{
 				flowData.setKeyword3_data(sdf.format(neaten.getDate()));
 				flowData.setKeyword4_data("正在申请");
 				flowData.setRemark_data("金额:" + jsonObject.getFloat("amount"));
-				flowData.setUrl("http://lzgfgs.com/voucher/mobile/1/flow/myTask.html");
+				flowData.setUrl("http://lzgfgs.com/voucher/mobile/flow/myTask.html");
 
 				List<Deliveran> list = flowData.getDeliverans();
 
 				Deliveran deliveran = new Deliveran();
-
-				System.out.println("content=" + jsonObject.getString("content"));
-				System.out.println("username=" + jsonObject.getString("username"));
-
+				
+				deliveran.setName(task.getName());
 				deliveran.setContent(jsonObject.getString("content"));
 				deliveran.setUserName(jsonObject.getString("username"));
+				deliveran.setResult(input);
 				deliveran.setDate(date);
-				MyTestUtil.print(deliveran);
+
 				list.add(deliveran);
 
 				flowData.setDeliverans(list);
@@ -249,6 +248,19 @@ public class neaten extends FlowProduct{
 				flowData.setRemark_data("金额:" + jsonObject.getFloat("amount"));
 				flowData.setUrl("http://lzgfgs.com/voucher/mobile/flow/myTask.html");
 
+				List<Deliveran> list = flowData.getDeliverans();
+
+				Deliveran deliveran = new Deliveran();
+		
+				deliveran.setName(task.getName());
+				deliveran.setUserName(jsonObject.getString("username"));
+				deliveran.setResult(3);
+				deliveran.setDate(date);
+	
+				list.add(deliveran);
+
+				flowData.setDeliverans(list);
+				
 				variables.put("input", input);
 
 				variables.put("neaten", neaten);
@@ -275,14 +287,13 @@ public class neaten extends FlowProduct{
 				List<Deliveran> list = flowData.getDeliverans();
 
 				Deliveran deliveran = new Deliveran();
-
-				System.out.println("content=" + jsonObject.getString("content"));
-				System.out.println("username=" + jsonObject.getString("username"));
-
+				
+				deliveran.setName(task.getName());
 				deliveran.setContent(jsonObject.getString("content"));
 				deliveran.setUserName(jsonObject.getString("username"));
+				deliveran.setResult(input);
 				deliveran.setDate(date);
-				MyTestUtil.print(deliveran);
+				
 				list.add(deliveran);
 
 				flowData.setDeliverans(list);
@@ -315,6 +326,19 @@ public class neaten extends FlowProduct{
 				flowData.setRemark_data("金额:" + jsonObject.getFloat("amountTotal"));
 				flowData.setUrl("http://lzgfgs.com/voucher/mobile/flow/myTask.html");
 
+				List<Deliveran> list = flowData.getDeliverans();
+
+				Deliveran deliveran = new Deliveran();
+				
+				deliveran.setName(task.getName());
+				deliveran.setUserName(jsonObject.getString("username"));
+				deliveran.setResult(3);
+				deliveran.setDate(date);
+
+				list.add(deliveran);
+
+				flowData.setDeliverans(list);
+				
 				variables.put("input", input);
 
 				variables.put("neaten", neaten);
@@ -331,7 +355,7 @@ public class neaten extends FlowProduct{
 			flowData.setKeyword2_data(sdf.format(neaten.getDate()));
 			flowData.setKeyword3_data(sdf.format(new Date()));
 			flowData.setRemark_data("请修改后重新提交审批");
-			flowData.setUrl("http://lzgfgs.com/voucher/mobile/1/flow/myTask.html");
+			flowData.setUrl("http://lzgfgs.com/voucher/mobile/flow/myTask.html");
 			
 			variables.put("flowData", flowData);
 			
@@ -340,11 +364,11 @@ public class neaten extends FlowProduct{
 		System.out.println("variables=");
 		
 		MyTestUtil.print(variables);
-	
+
 		processEngineFactory.getTaskService().setVariables(taskId, variables);
 		processEngineFactory.getTaskService()// 与正在执行的任务管理相关的Service
 				.complete(taskId, variables);
-			
+
 	}
 
 
