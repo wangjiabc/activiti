@@ -171,6 +171,25 @@ public class ServerImpl implements Server {
 		return map;
 	}
 
+	@Override
+	public Long findMyPersonalTaskCount(String assignee,Date afterDate) {
+		// TODO Auto-generated method stub
+			Long count=processEngineFactory.getTaskService()// 与正在执行的任务管理相关的Service
+				.createTaskQuery()// 创建任务查询
+				.taskAssigneeLike(assignee).taskCreatedAfter(afterDate).count();
+			
+			System.out.println("count=="+count);
+			
+		return count;
+	}
+	
+	@Override
+	public Long selectCountAfter(String openId, Date afterDate) {
+		// TODO Auto-generated method stub
+		
+		return processDaoImpl.selectCountAfter(openId, afterDate);
+		
+	}
 	
 	/** 跳转到任务页面 */
 	public String toRoute(@RequestParam String taskId,@RequestParam String className) {

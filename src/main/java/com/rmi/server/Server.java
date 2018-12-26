@@ -1,5 +1,6 @@
 package com.rmi.server;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -16,7 +17,11 @@ public interface Server {
 			@RequestParam String userId,@RequestParam String variableData,@RequestParam String className) throws Exception;
 	
 	public Map findMyPersonalTask(@RequestParam String assignee,@RequestParam Integer limit,@RequestParam Integer offset);
-		
+	
+	public Long findMyPersonalTaskCount(@RequestParam String assignee,@RequestParam Date afterDate);
+	
+	public Long selectCountAfter(String openId,Date afterDate);
+	
 	public String toRoute(@RequestParam String taskId,@RequestParam String className);
 	
 	public Object findMyPersonalTaskById(@RequestParam String id);

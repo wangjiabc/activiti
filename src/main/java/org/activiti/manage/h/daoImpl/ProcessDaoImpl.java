@@ -70,7 +70,7 @@ public class ProcessDaoImpl {
 
         Session session=sessionFactory.getCurrentSession();
 
-        List<RoomInfoFlowIdEntity> list=session.createQuery("from RoomInfoFlowIdEntity where guid=? and result=? order by update_time").setString(0, guid)
+        List<RoomInfoFlowIdEntity> list=session.createQuery("from RoomInfoFlowIdEntity where guid=? and result=? order by currentDate").setString(0, guid)
         		.setInteger(1, result).setMaxResults(limit).setFirstResult(offset).list();
         
         long total=(long) session.createQuery("select count(*) from RoomInfoFlowIdEntity where guid=? and result=? ").setString(0, guid)
@@ -110,7 +110,7 @@ public class ProcessDaoImpl {
 
         Session session=sessionFactory.getCurrentSession();
 
-        List<RoomInfoFlowIdEntity> list=session.createQuery("from RoomInfoFlowIdEntity where openId=? and result=? order by update_time").setString(0, openId)
+        List<RoomInfoFlowIdEntity> list=session.createQuery("from RoomInfoFlowIdEntity where openId=? and result=? order by currentDate").setString(0, openId)
         		.setInteger(1, result).setMaxResults(limit).setFirstResult(offset).list();
         
         long total=(long) session.createQuery("select count(*) from RoomInfoFlowIdEntity where openId=? and result=? ").setString(0, openId)
@@ -126,11 +126,27 @@ public class ProcessDaoImpl {
 	}
 	
 	@Transactional
+    public Long selectCountAfter(String openId,Date afterDate){
+
+        Session session=sessionFactory.getCurrentSession();
+
+        System.out.println("afterDate="+afterDate);
+        
+        long total=(long) session.createQuery("select count(*) from RoomInfoFlowIdEntity where openId=? and result=1 and currentDate>? ").setString(0, openId)
+        		.setTimestamp(1, afterDate).uniqueResult();
+        
+        System.out.println("total="+total);
+        
+        return total;
+        
+	}
+	
+	@Transactional
 	public Map selectAllByState(Integer state, int limit, int offset) {
 		Session session = sessionFactory.getCurrentSession();
 
 		List<RoomInfoFlowIdEntity> list = session
-				.createQuery("from RoomInfoFlowIdEntity where state=? order by update_time").setInteger(0, state)
+				.createQuery("from RoomInfoFlowIdEntity where state=? order by currentDate").setInteger(0, state)
 				.setMaxResults(limit).setFirstResult(offset).list();
 
 		long total =  (long) session.createQuery("select count(*) from RoomInfoFlowIdEntity where state=? ")
@@ -149,7 +165,7 @@ public class ProcessDaoImpl {
 
         Session session=sessionFactory.getCurrentSession();
 
-        List<RoomInfoFlowIdEntity> list=session.createQuery("from RoomInfoFlowIdEntity where result=? order by update_time").setInteger(0, result)
+        List<RoomInfoFlowIdEntity> list=session.createQuery("from RoomInfoFlowIdEntity where result=? order by currentDate").setInteger(0, result)
         		.setMaxResults(limit).setFirstResult(offset).list();
         
         long total= (long) session.createQuery("select count(*) from RoomInfoFlowIdEntity where result=? ")

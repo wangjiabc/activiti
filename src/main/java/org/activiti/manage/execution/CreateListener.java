@@ -78,12 +78,12 @@ public class CreateListener implements TaskListener{
 		RoomInfoFlowIdEntity roomInfoFlowIdEntity=new RoomInfoFlowIdEntity();
 		
 		roomInfoFlowIdEntity.setCurrentOpenId(assignee);
-		roomInfoFlowIdEntity.setUpdate_time(new Date());
+		roomInfoFlowIdEntity.setCurrentDate(new Date());
 
 		session.beginTransaction();
 		
-		session.createQuery("update RoomInfoFlowIdEntity set currentOpenId=? , Update_time_=? where processInstanceId=?")
-				.setString(0, assignee).setDate(1, new Date()).setString(2, delegateTask.getProcessInstanceId()).executeUpdate();
+		session.createQuery("update RoomInfoFlowIdEntity set currentOpenId=? , currentDate=? where processInstanceId=?")
+				.setString(0, assignee).setTimestamp(1, new Date()).setString(2, delegateTask.getProcessInstanceId()).executeUpdate();
 
         session.getTransaction().commit();
 		

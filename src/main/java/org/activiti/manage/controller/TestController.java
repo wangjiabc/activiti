@@ -146,7 +146,7 @@ public class TestController {
 	public void save() throws Exception {
 		RoomInfoFlowIdEntity roomInfoFlowIdEntity=new RoomInfoFlowIdEntity();
 		
-		roomInfoFlowIdEntity.setUpdate_time(new Date());
+		roomInfoFlowIdEntity.setCurrentDate(new Date());
 		processDaoImpl.save(roomInfoFlowIdEntity);
 
 	}

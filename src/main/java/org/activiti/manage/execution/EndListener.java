@@ -110,14 +110,14 @@ public class EndListener implements ExecutionListener{
 		
 		roomInfoFlowIdEntity.setCurrentOpenId(taskEntity.getAssignee());
 		roomInfoFlowIdEntity.setResult(input);		
-		roomInfoFlowIdEntity.setUpdate_time(new Date());
+		roomInfoFlowIdEntity.setCurrentDate(new Date());
 		roomInfoFlowIdEntity.setState(0);
 		
 		session.beginTransaction();
 		
-		int i=session.createQuery("update RoomInfoFlowIdEntity set currentOpenId=? , update_time=?,"
+		int i=session.createQuery("update RoomInfoFlowIdEntity set currentOpenId=? , currentDate=?,"
 				+ "state=? , result=? where processInstanceId=?")
-				.setString(0, taskEntity.getAssignee()).setDate(1, new Date())
+				.setString(0, taskEntity.getAssignee()).setTimestamp(1, new Date())
 				.setInteger(2, 0).setInteger(3, input)
 				.setString(4, taskEntity.getProcessInstanceId()).executeUpdate();
 

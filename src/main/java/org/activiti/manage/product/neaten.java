@@ -10,7 +10,9 @@ import java.util.Map;
 import org.activiti.engine.HistoryService;
 import org.activiti.engine.ProcessEngineConfiguration;
 import org.activiti.engine.runtime.ProcessInstance;
+import org.activiti.engine.task.IdentityLink;
 import org.activiti.engine.task.Task;
+import org.activiti.engine.task.TaskQuery;
 import org.activiti.manage.context.ConnectSession;
 import org.activiti.manage.factory.FlowProduct;
 import org.activiti.manage.tools.MyTestUtil;
@@ -23,9 +25,7 @@ import com.rmi.server.entity.Neaten;
 import com.rmi.server.entity.RoomInfoFlowIdEntity;
 
 public class neaten extends FlowProduct{
-	
-	Session session=new ConnectSession().get();
-	
+
 	@Override
 	public ProcessInstance start(String userId,String processDefinitionKey, String variableData,
 			ProcessEngineConfiguration processEngineFactory) throws Exception{
@@ -122,17 +122,19 @@ public class neaten extends FlowProduct{
 		Map taskMap=processEngineFactory.getTaskService().getVariables(taskId);
 		
 		String userId=(String) taskMap.get("userId");
-		
-		System.out.println("userId="+userId);
-		
+
 		String path;
 		
 		FlowData flowData=(FlowData) processEngineFactory.getTaskService().getVariable(taskId, "flowData");
 		
-		Task task=processEngineFactory.getTaskService().createTaskQuery().singleResult();
+		TaskQuery taskQuery=processEngineFactory.getTaskService().createTaskQuery().taskId(taskId);
+	
+		System.out.println("taskQuery="+taskQuery.list().get(0).getProcessInstanceId());
+		
+		String processInstanceId=taskQuery.list().get(0).getProcessInstanceId();
 
-		String processInstanceId=task.getProcessInstanceId();
-
+		Session session=new ConnectSession().get();
+		
 		List<RoomInfoFlowIdEntity> list=session.createQuery("from RoomInfoFlowIdEntity where processInstanceId=? ")
 				.setString(0, processInstanceId).list();
 		
@@ -186,9 +188,13 @@ public class neaten extends FlowProduct{
 		System.out.println("currentUserId=" + currentUserId);
 		System.out.println("userId=" + taskMap.get("userId"));
 
-		Task task=processEngineFactory.getTaskService().createTaskQuery().singleResult();
-
+		TaskQuery taskQuery=processEngineFactory.getTaskService().createTaskQuery().taskId(taskId);
+		
+		Task task=taskQuery.list().get(0);
+		
 		String processInstanceId=task.getProcessInstanceId();
+		
+		Session session=new ConnectSession().get();
 		
 		List<RoomInfoFlowIdEntity> RoomInfoFlowIdList=session.createQuery("from RoomInfoFlowIdEntity where processInstanceId=? ")
 				.setString(0, processInstanceId).list();

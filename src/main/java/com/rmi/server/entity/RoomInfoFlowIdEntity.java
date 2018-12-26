@@ -47,8 +47,8 @@ public class RoomInfoFlowIdEntity implements java.io.Serializable{
 	@Column(name = "Address_")
 	private String address;
 	
-	@Column(name = "Update_time_")
-	private Date update_time;
+	@Column(name = "CurrentDate_")
+	private Date currentDate;
 
 	@Column(name = "Date_")
 	private Date date;
@@ -108,14 +108,6 @@ public class RoomInfoFlowIdEntity implements java.io.Serializable{
 		this.date = date;
 	}
 
-	public Date getUpdate_time() {
-		return update_time;
-	}
-
-	public void setUpdate_time(Date update_time) {
-		this.update_time = update_time;
-	}
-
 	public String getOpenId() {
 		return openId;
 	}
@@ -146,5 +138,13 @@ public class RoomInfoFlowIdEntity implements java.io.Serializable{
 
 	public void setCurrentOpenId(String currentOpenId) {
 		this.currentOpenId = currentOpenId;
+	}
+
+	public Date getCurrentDate() {
+		return currentDate;
+	}
+
+	public void setCurrentDate(Date currentDate) {
+		this.currentDate = currentDate;
 	}
 }
