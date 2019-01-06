@@ -107,6 +107,7 @@
 		users.open_id = usersinfo.open_id
 		<where>
 			users.campus_id=#{campusId,jdbcType=INTEGER}
+			and users.place>1
 		<if test="search != null and search !='' ">
 				and (nickname like #{search,jdbcType=VARCHAR} or
 				usersinfo.phone like

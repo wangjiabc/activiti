@@ -2,7 +2,7 @@ package com.voucher.manage.model;
 
 import java.util.Date;
 
-public class Sellers1 {
+public class Sellers {
 	private String campusAdmin;
 	
 	private String password;

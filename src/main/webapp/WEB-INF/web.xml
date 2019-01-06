@@ -117,6 +117,30 @@
 	</mime-mapping>
   
 
+    <!-- 对管理员后台页面的文件栏截 -->
+	<filter>
+		<filter-name>SessionFilter</filter-name>
+		<filter-class>org.activiti.manage.filter.IsLoginFilter</filter-class>
+		<init-param>
+			<param-name>loginStrings</param-name><!-- 对登录页面不进行过滤 -->
+			<param-value>/login.html;/seller;/newmsg;/register;version.html;/mobile;/oauth;/wechat;/test;/safety;/guidance;/baiduMap;/baidumap</param-value>
+		</init-param>
+		<init-param>
+			<param-name>includeStrings</param-name><!-- 只对指定过滤参数后缀进行过滤 -->
+			<param-value>.html;.jsp;.do</param-value>
+		</init-param>
+		<init-param>
+			<param-name>redirectPath</param-name><!-- 未通过跳转到登录界面 -->
+			<param-value>/login.html</param-value>
+		</init-param>
+
+	</filter>
+
+	<filter-mapping>
+		<filter-name>SessionFilter</filter-name>
+		<url-pattern>/*</url-pattern>
+	</filter-mapping>
+
 	<welcome-file-list>
 	    <welcome-file>/index.html</welcome-file>
 	</welcome-file-list>

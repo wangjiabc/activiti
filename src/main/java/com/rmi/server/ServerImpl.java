@@ -30,6 +30,7 @@ import org.activiti.engine.impl.pvm.PvmTransition;
 import org.activiti.engine.impl.pvm.process.ActivityImpl;
 import org.activiti.engine.runtime.ProcessInstance;
 import org.activiti.engine.task.Task;
+import org.activiti.engine.task.TaskQuery;
 import org.activiti.image.ProcessDiagramGenerator;
 import org.activiti.image.impl.DefaultProcessDiagramGenerator;
 import org.activiti.manage.factory.FlowFactory;
@@ -46,6 +47,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.alibaba.fastjson.JSONObject;
+import com.rmi.server.entity.FlowData;
 import com.rmi.server.entity.Neaten;
 import com.rmi.server.entity.RoomInfoFlowIdEntity;
 import com.voucher.manage.model.Users;
@@ -280,7 +282,8 @@ public class ServerImpl implements Server {
 			map.put("id", task.getId());
 			map.put("owner", task.getOwner());
 			map.put("name", executionEntity.getName());
-			map.put("assignee", assigneeUsers.getName());
+			if(assigneeUsers!=null&&assigneeUsers.getName()!=null&&!assigneeUsers.getName().equals(""))
+				map.put("assignee", assigneeUsers.getName());
 			map.put("userId", users.getName());
 			map.put("description", task.getName());
 			map.put("executionId", task.getExecutionId());
@@ -320,6 +323,10 @@ public class ServerImpl implements Server {
      		   if(historicVariableInstanceEntity.getName().equals("neaten")){
      			   Neaten neaten=(Neaten) historicVariableInstanceEntity.getCachedValue();
      			   hMap.put("neaten", neaten);
+     		   } else if (historicVariableInstanceEntity.getName().equals("flowData")) {
+
+     			   FlowData flowData = (FlowData) historicVariableInstanceEntity.getCachedValue();
+     			   hMap.put("flowData", flowData);
      		   }
      		   
      		   i++;
@@ -521,13 +528,39 @@ public class ServerImpl implements Server {
 		
 		String filePath=pathRoot+"\\Desktop\\pasoft\\photo\\flow";
     	
+		String processDefinitionId=null;
+		
 		HistoricProcessInstance processInstance =  historyService.createHistoricProcessInstanceQuery().processInstanceId(executionId).singleResult();
         
-        ProcessDefinitionEntity definitionEntity = (ProcessDefinitionEntity)repositoryService.getProcessDefinition(processInstance.getProcessDefinitionId());
+		List<HistoricActivityInstance> highLightedActivitList =null;
+		
+		System.out.println("processInstance="+processInstance);
+		
+		if(processInstance==null){
+			
+			TaskQuery taskQuery=processEngineFactory.getTaskService().createTaskQuery().taskId(executionId);
+			
+			System.out.println("taskQuery="+taskQuery.list().get(0).getProcessInstanceId());
+			
+			processDefinitionId=taskQuery.list().get(0).getProcessDefinitionId();
+			
+			highLightedActivitList=historyService.createHistoricActivityInstanceQuery().processInstanceId(taskQuery.list().get(0).getExecutionId()).list();
+			
+		}else{
+			
+			highLightedActivitList=historyService.createHistoricActivityInstanceQuery().processInstanceId(executionId).list();
+			
+			processDefinitionId=processInstance.getProcessDefinitionId();
+		
+		}
+		
+		System.out.println(processDefinitionId);
+		
+        ProcessDefinitionEntity definitionEntity = (ProcessDefinitionEntity)repositoryService.getProcessDefinition(processDefinitionId);
         
-        BpmnModel bpmnModel = repositoryService.getBpmnModel(processInstance.getProcessDefinitionId());
+        BpmnModel bpmnModel = repositoryService.getBpmnModel(processDefinitionId);
         
-        List<HistoricActivityInstance> highLightedActivitList =  historyService.createHistoricActivityInstanceQuery().processInstanceId(executionId).list();
+          
         //高亮环节id集合
         List<String> highLightedActivitis = new ArrayList<String>();
         //高亮线路id集合

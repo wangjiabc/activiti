@@ -793,7 +793,7 @@ public class ActivitiController {
            ProcessDefinitionEntity definitionEntity = (ProcessDefinitionEntity)repositoryService.getProcessDefinition(processInstance.getProcessDefinitionId());
            
            BpmnModel bpmnModel = repositoryService.getBpmnModel(processInstance.getProcessDefinitionId());
-           
+           System.out.println("processInstance.getProcessDefinitionId()="+processInstance.getProcessDefinitionId());
            List<HistoricActivityInstance> highLightedActivitList =  historyService.createHistoricActivityInstanceQuery().processInstanceId(executionId).list();
            //高亮环节id集合
            List<String> highLightedActivitis = new ArrayList<String>();

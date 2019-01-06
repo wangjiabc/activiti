@@ -288,7 +288,7 @@ public class neaten extends FlowProduct{
 				flowData.setKeyword3_data(sdf.format(neaten.getDate()));
 				flowData.setKeyword4_data("正在申请");
 				flowData.setRemark_data("金额:" + jsonObject.getFloat("amount"));
-				flowData.setUrl("http://lzgfgs.com/voucher/mobile/1/flow/myTask.html");
+				flowData.setUrl("http://lzgfgs.com/voucher/mobile/flow/myTask.html");
 
 				List<Deliveran> list = flowData.getDeliverans();
 
@@ -337,6 +337,7 @@ public class neaten extends FlowProduct{
 				Deliveran deliveran = new Deliveran();
 				
 				deliveran.setName(task.getName());
+				deliveran.setContent(jsonObject.getString("content"));
 				deliveran.setUserName(jsonObject.getString("username"));
 				deliveran.setResult(3);
 				deliveran.setDate(date);

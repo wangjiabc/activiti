@@ -30,7 +30,7 @@ public class WebConfigurer implements ServletContextListener {
   public void contextInitialized(ServletContextEvent sce) {
     ServletContext servletContext = sce.getServletContext();
 
-    log.debug("Configuring Spring root application context");
+    //log.debug("Configuring Spring root application context");
     
     AnnotationConfigWebApplicationContext rootContext = null;
     
@@ -44,7 +44,7 @@ public class WebConfigurer implements ServletContextListener {
 
     initSpring(servletContext, rootContext);
 
-    log.debug("Web application fully configured");
+    //log.debug("Web application fully configured");
   }
 
   /**
@@ -69,8 +69,8 @@ public class WebConfigurer implements ServletContextListener {
   public void contextDestroyed(ServletContextEvent sce) {
     log.info("Destroying Web application");
     WebApplicationContext ac = WebApplicationContextUtils.getRequiredWebApplicationContext(sce.getServletContext());
-    AnnotationConfigWebApplicationContext gwac = (AnnotationConfigWebApplicationContext) ac;
-    gwac.close();
+  //  AnnotationConfigWebApplicationContext gwac = (AnnotationConfigWebApplicationContext) ac;
+  //  gwac.close();
     log.debug("Web application destroyed");
   }
 }

@@ -33,14 +33,17 @@
     <class>org.activiti.standalone.jpa.EmbeddableCompoundId</class>
     
     <exclude-unlisted-classes>true</exclude-unlisted-classes>
-    
-    <properties>
-        <property name="javax.persistence.jdbc.driver" value="com.mysql.jdbc.Driver" />
-        <property name="javax.persistence.jdbc.url" value="${jdbc_url}" />
-        <property name="javax.persistence.jdbc.user" value="${jdbc_username}" />
-        <property name="javax.persistence.jdbc.password" value="${jdbc_password}" />
-        <property name="hibernate.show_sql" value="true" />
-        <property name="hibernate.hbm2ddl.auto" value="update" />
-    </properties>
+
+	<properties>
+		<property name="javax.persistence.jdbc.driver" value="com.mysql.jdbc.Driver" />
+		<property name="javax.persistence.jdbc.url" value="${jdbc_url}" />
+		<property name="javax.persistence.jdbc.user" value="${jdbc_username}" />
+		<property name="javax.persistence.jdbc.password" value="${jdbc_password}" />
+		<property name="hibernate.show_sql" value="true" />
+		<property name="hibernate.hbm2ddl.auto" value="update" />
+		<property name="connection.autoReconnect" value="true" />
+		<property name="connection.autoReconnectForPools" value="true" />
+		<property name="connection.is-connection-validation-required" value="true" />
+	</properties>
   </persistence-unit>
 </persistence>
