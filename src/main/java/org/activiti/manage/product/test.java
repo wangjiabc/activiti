@@ -27,7 +27,7 @@ public class test extends FlowProduct{
 	
 	@Override
 	public ProcessInstance start(String userId,String processDefinitionKey, String variableData,
-			ProcessEngineConfiguration processEngineFactory) throws Exception{
+			List imageDataList,ProcessEngineConfiguration processEngineFactory) throws Exception{
 		// TODO Auto-generated method stub
 		
 		String address="";
@@ -150,7 +150,7 @@ public class test extends FlowProduct{
 	}
 	
 	@Override
-	public void personalTask(String taskId,Integer input, String variableData, ProcessEngineConfiguration processEngineFactory,HistoryService historyService) {
+	public void personalTask(String taskId,Integer input, String variableData, List imageDataList,ProcessEngineConfiguration processEngineFactory,HistoryService historyService) {
 		// TODO Auto-generated method stub
 		Neaten neaten= (Neaten) processEngineFactory.getTaskService()// 与正在执行的任务管理相关的Service
 				.getVariable(taskId,"neaten");

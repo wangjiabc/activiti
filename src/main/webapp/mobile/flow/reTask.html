@@ -86,6 +86,27 @@
                             </div>
 						</div>
 					</form>
+					       <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title" id="myModalLabel">上传图片</h4>
+            </div>
+            <div id="preview_box"></div>
+            <div class="modal-body">
+             <input id="img_input" type="file" accept="image/*"/>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                <button type="button" onclick="upload();" class="btn btn-primary">提交更改</button>
+            </div>
+        </div><!-- /.modal-content -->
+		<div class="form-group">
+            <div class="col-sm-5">
+                <button class="mybtn mybtn-medium mybtn-green w100" id="submit" onclick="addInfo();">保存</button>
+                <button class="mybtn mybtn-medium mybtn-green w100" type="button" onclick="history.back();" class="btn">返回</button>
+            </div>
+        </div>
+					
 		<div class="form-group">
             <div class="col-sm-5">
                 <button class="mybtn mybtn-medium mybtn-green w100" id="submit3" onclick="addInfo(1);">重新提交</button>
@@ -109,25 +130,79 @@
 	var taskId=getQueryString("taskId");
 	console.log(taskId);
 	
+	$("#img_input").on("change", function(e){
+
+		  var file = e.target.files[0]; //获取图片资源
+
+		  var reader = new FileReader();
+
+		  reader.readAsDataURL(file); // 读取文件
+
+		  // 渲染文件
+		  reader.onload = function(arg) {
+
+		    var img = '<img class="preview" src="' + arg.target.result + '" alt="preview"/>';
+		    $("#preview_box").empty().append(img);
+		  }
+		});
+
+	var img;
+
+	function upload(){
+
+		 var fileObj = $("#img_input").prop("files")[0];
+		 
+	  var FileController = "/voucher/test/inputImage.do"; // 接收上传文件的后台地址
+	  
+	  if (fileObj){
+	      // FormData 对象
+	      var form = new FormData();
+	      form.append("file", fileObj);// 文件对象
+	      // XMLHttpRequest 对象
+	      var xhr = new XMLHttpRequest();
+	      xhr.open("post", FileController, true);
+	      xhr.onload = function () {
+
+	      };
+	      xhr.send(form);
+	      xhr.onreadystatechange=function(){
+	      	 if(xhr.readyState == 4 && xhr.status == 200){    
+	      	     var b = xhr.responseText;    
+	      	   var data=JSON.parse(b);
+	      	        if(data.img != "error"){    
+	      	        	img=data.img;
+	      	        	console.log(img);
+	      	          
+	      	        }else{    
+	      	        	$("#myModal").modal("hide");
+	      	            
+	      	           
+	      	        }           
+	      	    }    
+	      };
+	  }
+	  
+	}
+	
 	 $.ajax({
          type: "post",
          async: false,
-         url: "../../flow/findMyTaskById.do",
+         url: "../flow/findMyTaskById.do",
          data: {
         	 id:taskId
          	}
 
          ,
          success: function (data) {
-			console.log(data);
-            $("#guid").val(data.hidden_Neaten.guid);
-            $("#neaten_id").val(data.hidden_Neaten.neaten_id);
-            $("#neaten_name").val(data.hidden_Neaten.neaten_name);
-            $("#neaten_instance").val(data.hidden_Neaten.neaten_instance);
-            $("#area").val(data.hidden_Neaten.area);
-            $("#type").val(data.hidden_Neaten.type);
-            $("#amount").val(data.hidden_Neaten.amount);
-            $("#workUnit").val(data.hidden_Neaten.workUnit);
+			console.log("data="+data.neaten);
+            $("#guid").val(data.neaten.guid);
+            $("#neaten_id").val(data.neaten.neaten_id);
+            $("#neaten_name").val(data.neaten.neaten_name);
+            $("#neaten_instance").val(data.neaten.neaten_instance);
+            $("#area").val(data.neaten.area);
+            $("#type").val(data.neaten.type);
+            $("#amount").val(data.neaten.amount);
+            $("#workUnit").val(data.neaten.workUnit);
          }
      })
 	
@@ -143,18 +218,23 @@
         clientInfo.type = $("#type").val().toString();
         clientInfo.amount = $("#amount").val().toString();
         clientInfo.workUnit = $("#workUnit").val().toString();
+        clientInfo.principal = "principal";
+        clientInfo.remark = "remark";
+        clientInfo.availabeLength = "1";
+        clientInfo.username = "ccc";
         var clientInfodata = JSON.stringify(clientInfo);
         
         $.ajax({
             type: "post",
             async: false,
-            url: "../../flow/personalTask.do",
+            url: "../flow/personalTask.do",
             data: {
             	
             	variableData: clientInfodata,
             	input:input,
             	className:"neaten",
-            	taskId:taskId
+            	taskId:taskId,
+            	img:img
             	}
 
             ,

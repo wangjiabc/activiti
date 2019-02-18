@@ -14,7 +14,8 @@ import com.alibaba.fastjson.JSONObject;
 public interface Server {
 
 	public Map startProcessInstance(@RequestParam String processDefinitionKey,
-			@RequestParam String userId,@RequestParam String variableData,@RequestParam String className) throws Exception;
+			@RequestParam String userId,@RequestParam String variableData,
+			@RequestParam List imageDataList,@RequestParam String className) throws Exception;
 	
 	public Map findMyPersonalTask(@RequestParam String assignee,@RequestParam Integer limit,@RequestParam Integer offset);
 	
@@ -27,7 +28,7 @@ public interface Server {
 	public Object findMyPersonalTaskById(@RequestParam String id);
 	
 	public Map completeMyPersonalTask(@RequestParam String taskId,@RequestParam Integer input,@RequestParam String variableData,
-			@RequestParam String className) throws Exception;
+			@RequestParam String className,@RequestParam List imageDataList) throws Exception;
 	
 	public Map findHistoryById(@RequestParam String id);
 	

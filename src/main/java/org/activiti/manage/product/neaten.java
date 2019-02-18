@@ -21,6 +21,7 @@ import org.json.JSONObject;
 
 import com.rmi.server.entity.Deliveran;
 import com.rmi.server.entity.FlowData;
+import com.rmi.server.entity.ImageData;
 import com.rmi.server.entity.Neaten;
 import com.rmi.server.entity.RoomInfoFlowIdEntity;
 
@@ -28,7 +29,7 @@ public class neaten extends FlowProduct{
 
 	@Override
 	public ProcessInstance start(String userId,String processDefinitionKey, String variableData,
-			ProcessEngineConfiguration processEngineFactory) throws Exception{
+			List imageDataList,ProcessEngineConfiguration processEngineFactory) throws Exception{
 		// TODO Auto-generated method stub
 		
 		String address="";
@@ -93,6 +94,7 @@ public class neaten extends FlowProduct{
 
 		flowData.setDeliverans(list);
 
+		flowData.setImageDataList(imageDataList);
 		
 		variables.put("neaten", neaten);
 
@@ -162,7 +164,8 @@ public class neaten extends FlowProduct{
 	}
 	
 	@Override
-	public void personalTask(String taskId,Integer input, String variableData, ProcessEngineConfiguration processEngineFactory,HistoryService historyService) {
+	public void personalTask(String taskId,Integer input, String variableData,
+			List imageDataList,ProcessEngineConfiguration processEngineFactory,HistoryService historyService) {
 		// TODO Auto-generated method stub
 		Neaten neaten= (Neaten) processEngineFactory.getTaskService()// 与正在执行的任务管理相关的Service
 				.getVariable(taskId,"neaten");
@@ -267,6 +270,12 @@ public class neaten extends FlowProduct{
 
 				flowData.setDeliverans(list);
 				
+				List<ImageData> imageDatas=flowData.getImageDataList();
+				
+				imageDatas.addAll(imageDataList);
+				
+				flowData.setImageDataList(imageDatas);
+				
 				variables.put("input", input);
 
 				variables.put("neaten", neaten);
@@ -345,6 +354,14 @@ public class neaten extends FlowProduct{
 				list.add(deliveran);
 
 				flowData.setDeliverans(list);
+				
+				flowData.setDeliverans(list);
+				
+				List<ImageData> imageDatas=flowData.getImageDataList();
+				
+				imageDatas.addAll(imageDataList);
+				
+				flowData.setImageDataList(imageDatas);
 				
 				variables.put("input", input);
 

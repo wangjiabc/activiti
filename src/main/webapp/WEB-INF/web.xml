@@ -8,9 +8,8 @@
 	<context-param>
 		<param-name>contextConfigLocation</param-name>
 		<param-value>
-		classpath:spring.xml,classpath:spring-sqlservers.xml,classpath:spring-mybatis.xml,
-		classpath:spring-mybatis2.xml,classpath:spring-activiti.xml,
-		classpath:activiti-mysql.xml
+		classpath:spring.xml,classpath:spring-mybatis.xml,
+		classpath:spring-mybatis2.xml,classpath:spring-activiti.xml
 		</param-value>
 	</context-param>
   <!-- Spring字符集过滤器 -->

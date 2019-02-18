@@ -1,6 +1,7 @@
 package org.activiti.manage.controller;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -24,6 +25,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.rmi.server.entity.ImageData;
 import com.voucher.manage.model.Users;
 
 @RequestMapping("/flow")
@@ -51,7 +53,7 @@ public class FlowController {
 	/** 启动流程实例 **/
 	@RequestMapping(value = "/start")
 	public @ResponseBody Map startProcessInstance(@RequestParam String processDefinitionKey,
-			@RequestParam String userId,@RequestParam String variableData,@RequestParam String className) {
+			@RequestParam String userId,@RequestParam String variableData,@RequestParam String className,String img) {
 		// 流程定义的key
 		
 		Map map = new HashMap<>();
@@ -60,8 +62,18 @@ public class FlowController {
 			// 用来设置启动流程的人员ID，引擎会自动把用户ID保存到activiti:initiator中
 			processEngineFactory.getIdentityService().setAuthenticatedUserId(userId);
 			
+			List list=new ArrayList<>();
+			
+			if(img!=null){
+				ImageData imageData=new ImageData();
+				imageData.setName("aaa");
+				imageData.setDate(new Date());
+				imageData.setURI(img);
+				list.add(imageData);
+			}
+			
 			ProcessInstance pi = new FlowFactory(className).getProduct().start(userId,processDefinitionKey, variableData,
-					processEngineFactory);
+					list,processEngineFactory);
 			map.put("state", "succeed");
 			
 			System.out.println("pi="+pi);
@@ -144,13 +156,23 @@ public class FlowController {
 	/** 完成我的任务 */
 	@RequestMapping(value = "/personalTask")
 	public @ResponseBody Map completeMyPersonalTask(@RequestParam String taskId,@RequestParam Integer input,@RequestParam String variableData,
-			@RequestParam String className) {
+			@RequestParam String className,String img) {
 
 		Map map = new HashMap<>();
 
+		List list=new ArrayList<>();
+		
+		if(img!=null){
+			ImageData imageData=new ImageData();
+			imageData.setName("aaa");
+			imageData.setDate(new Date());
+			imageData.setURI(img);
+			list.add(imageData);
+		}
+		
 		try {
 			
-			new FlowFactory(className).getProduct().personalTask(taskId,input,variableData,processEngineFactory,historyService);
+			new FlowFactory(className).getProduct().personalTask(taskId,input,variableData,list,processEngineFactory,historyService);
 			map.put("完成任务：任务ID:", taskId);
 
 		} catch (Exception e) {

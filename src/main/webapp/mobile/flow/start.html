@@ -86,7 +86,20 @@
                             </div>
 						</div>
 					</form>
-
+       <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title" id="myModalLabel">上传图片</h4>
+            </div>
+            <div id="preview_box"></div>
+            <div class="modal-body">
+             <input id="img_input" type="file" accept="image/*"/>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                <button type="button" onclick="upload();" class="btn btn-primary">提交更改</button>
+            </div>
+        </div><!-- /.modal-content -->
 		<div class="form-group">
             <div class="col-sm-5">
                 <button class="mybtn mybtn-medium mybtn-green w100" id="submit" onclick="addInfo();">保存</button>
@@ -95,6 +108,60 @@
         </div>
 					
 <script type="text/javascript">	
+
+$("#img_input").on("change", function(e){
+
+	  var file = e.target.files[0]; //获取图片资源
+
+	  var reader = new FileReader();
+
+	  reader.readAsDataURL(file); // 读取文件
+
+	  // 渲染文件
+	  reader.onload = function(arg) {
+
+	    var img = '<img class="preview" src="' + arg.target.result + '" alt="preview"/>';
+	    $("#preview_box").empty().append(img);
+	  }
+	});
+
+var img;
+
+function upload(){
+
+	 var fileObj = $("#img_input").prop("files")[0];
+	 
+  var FileController = "/voucher/test/inputImage.do"; // 接收上传文件的后台地址
+  
+  if (fileObj){
+      // FormData 对象
+      var form = new FormData();
+      form.append("file", fileObj);// 文件对象
+      // XMLHttpRequest 对象
+      var xhr = new XMLHttpRequest();
+      xhr.open("post", FileController, true);
+      xhr.onload = function () {
+
+      };
+      xhr.send(form);
+      xhr.onreadystatechange=function(){
+      	 if(xhr.readyState == 4 && xhr.status == 200){    
+      	     var b = xhr.responseText;    
+      	   var data=JSON.parse(b);
+      	        if(data.img != "error"){    
+      	        	img=data.img;
+      	        	console.log(img);
+      	          
+      	        }else{    
+      	        	$("#myModal").modal("hide");
+      	            
+      	           
+      	        }           
+      	    }    
+      };
+  }
+  
+}
 
 	function addInfo() {
         var clientInfo = new Object();
@@ -127,7 +194,8 @@
             	processDefinitionKey:"neaten",
             	userId:"ccc",
             	variableData: clientInfodata,
-            	className:"neaten"
+            	className:"neaten",
+            	img:img
             	}
             ,
             success: function (data) {

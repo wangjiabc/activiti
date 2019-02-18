@@ -101,7 +101,11 @@
 		</div>			
 	</div>
 			</form>
-			
+		<div class="weui-panel weui-panel_access">
+							<div class="weui-panel__hd">维修照片</div>
+							<div id="img" class="weui-panel__bd">
+							</div>
+						</div>	
 		<div class="form-group">
             <div class="col-sm-5">
                 <button class="mybtn mybtn-medium mybtn-green w100" id="submit" onclick="addInfo(1);">同意</button>
@@ -136,6 +140,7 @@
 
          ,
          success: function (text) {
+        	 console.log(text);
         	 var data=text.neaten;
 			console.log(data);
             $("#guid").val(data.guid);
@@ -153,6 +158,54 @@
             for(var i=0;i<deliverans.length;i++){
             	addDiv(i,deliverans[i].name,deliverans[i].content,deliverans[i].userName,deliverans[i].result,deliverans[i].date);
             }
+            
+            console.log(flowData);
+            
+            var imgs=flowData.imageDataList;
+            
+            if(imgs!=null){
+              	   var i = 0;
+                     for(; i < imgs.length; i++){
+                  	   
+                  	  var data=imgs[i];
+                  	  var name=data.name;
+                  	  var uri="/Desktop/pasoft/photo/compressFile/"+data.uri;
+                  	  var date=actionTime(data.date);
+                  	  var panel=document.createElement("div");
+                  	  panel.setAttribute("class","weui-panel__bd");
+                    	   var a=document.createElement("a");
+                   	   a.setAttribute("class","weui_grid");
+                   	   var a=document.createElement("a");
+                   	  a.setAttribute("href","javascript:void(0);");
+                   	   a.setAttribute("class","weui-media-box weui-media-box_appmsg");
+                   	   var div=document.createElement("div");
+                   	  	div.setAttribute("class","weui-media-box__hd");
+                   	  
+              	   	 	 src="/voucher/"+uri;
+              	  	  	var img=document.createElement("img");
+              	  	  	img.setAttribute("class","weui-media-box__thumb");
+                        	img.setAttribute("src",src);
+                      
+                     	  	div.appendChild(img);
+                     	   		
+                     	  	div2=document.createElement("div");
+                     	  		div2.setAttribute("class","weui-media-box__bd");
+                     	 		h4=document.createElement("h4");
+                     	 		h4.setAttribute("class","weui-media-box__title");
+                     	 	 	h4.innerHTML=name;
+                     	  	 	p=document.createElement("p");
+                     	  	 	p.setAttribute("class","weui-media-box__desc");
+                     	  	 	p.innerHTML=date;
+                     	     div2.appendChild(h4);
+                     	     div2.appendChild(p);
+                     	   a.appendChild(div);
+                     	   a.appendChild(div2);
+                     	   panel.appendChild(a);
+              	      	  $("#img").append(panel);
+                     }
+      		   
+      	   		}
+            
          }
      })
 	

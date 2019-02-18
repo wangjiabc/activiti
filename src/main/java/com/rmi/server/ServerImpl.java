@@ -84,7 +84,8 @@ public class ServerImpl implements Server {
 	
 	/** 启动流程实例 **/
 	public Map startProcessInstance (@RequestParam String processDefinitionKey,
-			@RequestParam String userId,@RequestParam String variableData,@RequestParam String className) 
+			@RequestParam String userId,@RequestParam String variableData,
+			@RequestParam List imageDataList,@RequestParam String className) 
 					throws Exception{
 		// 流程定义的key
 		
@@ -96,7 +97,7 @@ public class ServerImpl implements Server {
 		processEngineFactory.getIdentityService().setAuthenticatedUserId(userId);
 
 		ProcessInstance pi = new FlowFactory(className).getProduct().start(userId, processDefinitionKey, variableData,
-				processEngineFactory);
+				imageDataList,processEngineFactory);
 		map.put("state", "流程启动成功");
 
 		System.out.println("pi=" + pi);
@@ -226,7 +227,7 @@ public class ServerImpl implements Server {
 
 	/** 完成我的任务 */
 	public Map completeMyPersonalTask(@RequestParam String taskId,@RequestParam Integer input,@RequestParam String variableData,
-			@RequestParam String className) throws Exception{
+			@RequestParam String className,@RequestParam List imageDataList) throws Exception{
 
 		Map map = new HashMap<>();
 
@@ -235,7 +236,7 @@ public class ServerImpl implements Server {
 		
 		try {
 			
-			new FlowFactory(className).getProduct().personalTask(taskId,input,variableData,processEngineFactory,historyService);
+			new FlowFactory(className).getProduct().personalTask(taskId,input,variableData,imageDataList,processEngineFactory,historyService);
 			map.put("完成任务：任务ID:", taskId);
 
 		} catch (org.activiti.engine.ActivitiObjectNotFoundException e) {

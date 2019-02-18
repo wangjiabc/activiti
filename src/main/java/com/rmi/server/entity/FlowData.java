@@ -32,6 +32,8 @@ public class FlowData implements Serializable{
 
 		private List<Deliveran> deliverans;
 		
+		private List<ImageData> imageDataList;
+		
 		public String getFirst_data() {
 			return first_data;
 		}
@@ -118,6 +120,14 @@ public class FlowData implements Serializable{
 
 		public void setDeliverans(List<Deliveran> deliverans) {
 			this.deliverans = deliverans;
+		}
+
+		public List<ImageData> getImageDataList() {
+			return imageDataList;
+		}
+
+		public void setImageDataList(List<ImageData> imageDataList) {
+			this.imageDataList = imageDataList;
 		}
 	
 }
