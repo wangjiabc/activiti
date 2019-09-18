@@ -10,7 +10,7 @@ public class FlowData implements Serializable{
 	*/
 		private static final long serialVersionUID = 1L;
 
-		private String Template_Id;
+		private String title;
 		
 		private String Send_Type;
 		
@@ -32,8 +32,6 @@ public class FlowData implements Serializable{
 
 		private List<Deliveran> deliverans;
 		
-		private List<ImageData> imageDataList;
-		
 		public String getFirst_data() {
 			return first_data;
 		}
@@ -41,7 +39,7 @@ public class FlowData implements Serializable{
 		public void setFirst_data(String first_data) {
 			this.first_data = first_data;
 		}
-
+		
 		public String getKeyword1_data() {
 			return keyword1_data;
 		}
@@ -90,13 +88,6 @@ public class FlowData implements Serializable{
 			this.remark_data = remark_data;
 		}
 
-		public String getTemplate_Id() {
-			return Template_Id;
-		}
-
-		public void setTemplate_Id(String template_Id) {
-			Template_Id = template_Id;
-		}
 
 		public String getSend_Type() {
 			return Send_Type;
@@ -122,12 +113,12 @@ public class FlowData implements Serializable{
 			this.deliverans = deliverans;
 		}
 
-		public List<ImageData> getImageDataList() {
-			return imageDataList;
+		public String getTitle() {
+			return title;
 		}
 
-		public void setImageDataList(List<ImageData> imageDataList) {
-			this.imageDataList = imageDataList;
+		public void setTitle(String title) {
+			this.title = title;
 		}
 	
 }

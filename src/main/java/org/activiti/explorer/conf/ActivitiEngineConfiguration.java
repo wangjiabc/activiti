@@ -55,6 +55,7 @@ public class ActivitiEngineConfiguration {
     
     // Connection settings
     ds.setUrl(environment.getProperty("jdbc.url", "jdbc:mysql://127.0.0.1:3306/activiti?characterEncoding=UTF-8"));
+    //ds.setUrl(environment.getProperty("jdbc.url", "jdbc:mysql://127.0.0.1:3307/activiti?characterEncoding=UTF-8"));
     ds.setUsername(environment.getProperty("jdbc.username", "sa"));
     ds.setPassword(environment.getProperty("jdbc.password", ""));
     

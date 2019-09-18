@@ -21,9 +21,9 @@ import org.json.JSONObject;
 
 import com.rmi.server.entity.Deliveran;
 import com.rmi.server.entity.FlowData;
-import com.rmi.server.entity.ImageData;
 import com.rmi.server.entity.Neaten;
 import com.rmi.server.entity.RoomInfoFlowIdEntity;
+import com.voucher.manage.singleton.Singleton;
 
 public class neaten extends FlowProduct{
 
@@ -74,7 +74,7 @@ public class neaten extends FlowProduct{
 		SimpleDateFormat sdf2 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		String time2 = sdf2.format(date);
 
-		flowData.setTemplate_Id("9iK_AqQpwEZPew9-TgMAy1zyuBGfB1pbuZ3DBGuEXz0");
+		flowData.setTitle("申请待审核通知");
 		flowData.setSend_Type("维修审批");
 		flowData.setFirst_data(address + "维修申请");
 		flowData.setKeyword1_data(jsonObject.getString("username"));
@@ -82,7 +82,7 @@ public class neaten extends FlowProduct{
 		flowData.setKeyword3_data(time2);
 		flowData.setKeyword4_data("正在申请");
 		flowData.setRemark_data("金额:" + jsonObject.getFloat("amount"));
-		flowData.setUrl("http://lzgfgs.com/voucher/mobile/flow/myTask.html");
+		flowData.setUrl(Singleton.URL+"/mobile/flow/myTask.html");
 
 		Deliveran deliveran = new Deliveran();
 
@@ -94,7 +94,6 @@ public class neaten extends FlowProduct{
 
 		flowData.setDeliverans(list);
 
-		flowData.setImageDataList(imageDataList);
 		
 		variables.put("neaten", neaten);
 
@@ -210,12 +209,12 @@ public class neaten extends FlowProduct{
 			
 			if (!currentUserId.equals(taskMap.get("userId"))) {
 
-				flowData.setTemplate_Id("9iK_AqQpwEZPew9-TgMAy1zyuBGfB1pbuZ3DBGuEXz0");
+				flowData.setTitle("申请待审核通知");
 				flowData.setKeyword2_data(neaten.getNeaten_item() + "整改维修");
 				flowData.setKeyword3_data(sdf.format(neaten.getDate()));
 				flowData.setKeyword4_data("正在申请");
 				flowData.setRemark_data("金额:" + jsonObject.getFloat("amount"));
-				flowData.setUrl("http://lzgfgs.com/voucher/mobile/flow/myTask.html");
+				flowData.setUrl(Singleton.URL+"/mobile/flow/myTask.html");
 
 				List<Deliveran> list = flowData.getDeliverans();
 
@@ -232,7 +231,9 @@ public class neaten extends FlowProduct{
 				flowData.setDeliverans(list);
 
 				variables.put("input", input);
-
+				
+				variables.put("amount", jsonObject.getFloat("amount"));
+				
 				variables.put("flowData", flowData);
 				MyTestUtil.print(flowData);
 				MyTestUtil.print(variables);
@@ -249,13 +250,13 @@ public class neaten extends FlowProduct{
 				neaten.setAvailabeLength(jsonObject.getString("availabeLength"));
 				neaten.setWorkUnit(jsonObject.getString("workUnit"));
 
-				flowData.setTemplate_Id("9iK_AqQpwEZPew9-TgMAy1zyuBGfB1pbuZ3DBGuEXz0");
+				flowData.setTitle("申请待审核通知");
 				flowData.setFirst_data(neaten.getAddress() + "维修申请");
 				flowData.setKeyword2_data(neaten.getNeaten_item() + "维修申请");
 				flowData.setKeyword3_data(sdf.format(neaten.getDate()));
 				flowData.setKeyword4_data("正在申请");
 				flowData.setRemark_data("金额:" + jsonObject.getFloat("amount"));
-				flowData.setUrl("http://lzgfgs.com/voucher/mobile/flow/myTask.html");
+				flowData.setUrl(Singleton.URL+"/mobile/flow/myTask.html");
 
 				List<Deliveran> list = flowData.getDeliverans();
 
@@ -270,14 +271,10 @@ public class neaten extends FlowProduct{
 
 				flowData.setDeliverans(list);
 				
-				List<ImageData> imageDatas=flowData.getImageDataList();
-				
-				imageDatas.addAll(imageDataList);
-				
-				flowData.setImageDataList(imageDatas);
-				
 				variables.put("input", input);
 
+				variables.put("amount", jsonObject.getFloat("amount"));
+				
 				variables.put("neaten", neaten);
 
 				variables.put("flowData", flowData);
@@ -291,13 +288,13 @@ public class neaten extends FlowProduct{
 			
 			if (!currentUserId.equals(taskMap.get("userId"))) {
 
-				flowData.setTemplate_Id("9iK_AqQpwEZPew9-TgMAy1zyuBGfB1pbuZ3DBGuEXz0");
+				flowData.setTitle("申请待审核通知");
 				flowData.setFirst_data(neaten.getAddress() + "验收申请");
 				flowData.setKeyword2_data(neaten.getNeaten_item() + "维修验收申请");
 				flowData.setKeyword3_data(sdf.format(neaten.getDate()));
 				flowData.setKeyword4_data("正在申请");
 				flowData.setRemark_data("金额:" + jsonObject.getFloat("amount"));
-				flowData.setUrl("http://lzgfgs.com/voucher/mobile/flow/myTask.html");
+				flowData.setUrl(Singleton.URL+"/mobile/flow/myTask.html");
 
 				List<Deliveran> list = flowData.getDeliverans();
 
@@ -333,13 +330,13 @@ public class neaten extends FlowProduct{
 				neaten.setAvailabeLength(jsonObject.getString("availabeLength"));
 				neaten.setWorkUnit(jsonObject.getString("workUnit"));
 
-				flowData.setTemplate_Id("9iK_AqQpwEZPew9-TgMAy1zyuBGfB1pbuZ3DBGuEXz0");
+				flowData.setTitle("申请待审核通知");
 				flowData.setFirst_data(neaten.getAddress() + "验收申请");
 				flowData.setKeyword2_data(neaten.getNeaten_item() + "维修验收申请");
 				flowData.setKeyword3_data(sdf.format(neaten.getDate()));
 				flowData.setKeyword4_data("正在申请");
 				flowData.setRemark_data("金额:" + jsonObject.getFloat("amountTotal"));
-				flowData.setUrl("http://lzgfgs.com/voucher/mobile/flow/myTask.html");
+				flowData.setUrl(Singleton.URL+"/mobile/flow/myTask.html");
 
 				List<Deliveran> list = flowData.getDeliverans();
 
@@ -355,14 +352,6 @@ public class neaten extends FlowProduct{
 
 				flowData.setDeliverans(list);
 				
-				flowData.setDeliverans(list);
-				
-				List<ImageData> imageDatas=flowData.getImageDataList();
-				
-				imageDatas.addAll(imageDataList);
-				
-				flowData.setImageDataList(imageDatas);
-				
 				variables.put("input", input);
 
 				variables.put("neaten", neaten);
@@ -375,11 +364,12 @@ public class neaten extends FlowProduct{
 		
 		if(input==2){
 			
-			flowData.setTemplate_Id("LWfojRihMettsLzgs72r4oP86UIBRsEvrUKeMZbRpM4");
+			
+			flowData.setTitle("审批退回提醒");
 			flowData.setKeyword2_data(sdf.format(neaten.getDate()));
 			flowData.setKeyword3_data(sdf.format(new Date()));
 			flowData.setRemark_data("请修改后重新提交审批");
-			flowData.setUrl("http://lzgfgs.com/voucher/mobile/flow/myTask.html");
+			flowData.setUrl(Singleton.URL+"/mobile/flow/myTask.html");
 			
 			variables.put("flowData", flowData);
 			

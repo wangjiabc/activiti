@@ -23,6 +23,7 @@ import org.springframework.stereotype.Service;
 import com.rmi.server.entity.FlowData;
 import com.rmi.server.entity.Neaten;
 import com.rmi.server.entity.RoomInfoFlowIdEntity;
+import com.voucher.manage.singleton.Singleton;
 
 import common.HttpClient;
 
@@ -34,8 +35,7 @@ public class CreateListener implements TaskListener{
 	
 	private static final long serialVersionUID = 1L;
 
-	private static final String requestUrl = "http://127.0.0.1:8080/voucher/mobile/WechatSendMessage/send.do";
-	
+	private static final String requestUrl = Singleton.URL+"/mobile/WechatSendMessage/send.do";
 	private static HttpClient httpClient = new HttpClient();
 	
 	@Override
@@ -90,8 +90,9 @@ public class CreateListener implements TaskListener{
 		FlowData flowData=(FlowData) map.get("flowData");
 		
 		List<BasicNameValuePair> reqParam = new ArrayList<BasicNameValuePair>();
+		reqParam.add(new BasicNameValuePair("campusId", "1"));
 		reqParam.add(new BasicNameValuePair("openId", assignee));
-		reqParam.add(new BasicNameValuePair("Template_Id", flowData.getTemplate_Id()));
+		reqParam.add(new BasicNameValuePair("title", flowData.getTitle()));
 		reqParam.add(new BasicNameValuePair("Send_Type", flowData.getSend_Type()));
 		reqParam.add(new BasicNameValuePair("url", flowData.getUrl()));
 		reqParam.add(new BasicNameValuePair("first_data", flowData.getFirst_data()));

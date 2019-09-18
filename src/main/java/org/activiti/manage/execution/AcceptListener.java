@@ -17,6 +17,7 @@ import org.hibernate.Session;
 import com.rmi.server.entity.FlowData;
 import com.rmi.server.entity.Neaten;
 import com.rmi.server.entity.RoomInfoFlowIdEntity;
+import com.voucher.manage.singleton.Singleton;
 
 import common.HttpClient;
 
@@ -24,8 +25,7 @@ public class AcceptListener implements ExecutionListener{
 	
 	private static final long serialVersionUID = 1L;
 
-	private static final String requestUrl = "http://127.0.0.1:8080/voucher/mobile/WechatSendMessage/send.do";
-	
+	private static final String requestUrl = Singleton.URL+"/mobile/WechatSendMessage/send.do";
 	private static HttpClient httpClient = new HttpClient();
 	
 	@Override
@@ -80,9 +80,9 @@ public class AcceptListener implements ExecutionListener{
 
 		List<BasicNameValuePair> reqParam = new ArrayList<BasicNameValuePair>();
 		reqParam.add(new BasicNameValuePair("openId", userId));
-		reqParam.add(new BasicNameValuePair("Template_Id", "M_TnyO6o3U6bImli9xsfXhL-rCskh9YYaSzCLWMdbJM"));
+		reqParam.add(new BasicNameValuePair("title", "审核结果通知"));
 		reqParam.add(new BasicNameValuePair("Send_Type", "整改审批"));
-		reqParam.add(new BasicNameValuePair("url", "http://lzgfgs.com/voucher/mobile/flow/myTask.html"));
+		reqParam.add(new BasicNameValuePair("url", Singleton.URL+"/mobile/flow/myTask.html"));
 		reqParam.add(new BasicNameValuePair("first_data", "审核时间:"+time));
 		reqParam.add(new BasicNameValuePair("keyword1_data", neaten.getNeaten_item() + "整改维修申请"));
 		reqParam.add(new BasicNameValuePair("keyword2_data", "维修申请方案已通过,请提交验收申请"));

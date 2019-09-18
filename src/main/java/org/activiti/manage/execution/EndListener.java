@@ -1,34 +1,25 @@
 package org.activiti.manage.execution;
 
-import java.io.Serializable;
-import java.net.URLDecoder;
 import java.net.URLEncoder;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-import javax.annotation.Resource;
 
 import org.activiti.engine.delegate.DelegateExecution;
 import org.activiti.engine.delegate.ExecutionListener;
 import org.activiti.engine.impl.persistence.entity.TaskEntity;
 import org.activiti.manage.context.ConnectSession;
-import org.activiti.manage.context.DBUtils;
 import org.activiti.manage.tools.MyTestUtil;
 import org.apache.http.message.BasicNameValuePair;
 import org.hibernate.Session;
-import org.hibernate.SessionFactory;
 
 import com.rmi.server.entity.FlowData;
 import com.rmi.server.entity.Neaten;
 import com.rmi.server.entity.RoomInfoFlowIdEntity;
-import com.sun.org.glassfish.external.statistics.annotations.Reset;
+import com.voucher.manage.singleton.Singleton;
 
 import common.HttpClient;
 
@@ -36,9 +27,8 @@ public class EndListener implements ExecutionListener{
 	
 	private static final long serialVersionUID = 1L;
 
-	private static final String requestUrl = "http://127.0.0.1:8080/voucher/mobile/WechatSendMessage/send.do";
-	
-	private static final String upRoomNeateUrl = "http://127.0.0.1:8080/voucher/mobile/user/upRoomNeatenFlowById.do";
+	private static final String requestUrl = Singleton.URL+"/mobile/WechatSendMessage/send.do";
+	private static final String upRoomNeateUrl = Singleton.URL+"/mobile/user/upRoomNeatenFlowById.do";
 	
 	private static HttpClient httpClient = new HttpClient();
 	
@@ -151,9 +141,9 @@ public class EndListener implements ExecutionListener{
 
 		List<BasicNameValuePair> reqParam = new ArrayList<BasicNameValuePair>();
 		reqParam.add(new BasicNameValuePair("openId", userId));
-		reqParam.add(new BasicNameValuePair("Template_Id", "M_TnyO6o3U6bImli9xsfXhL-rCskh9YYaSzCLWMdbJM"));
+		reqParam.add(new BasicNameValuePair("title", "审核结果通知"));
 		reqParam.add(new BasicNameValuePair("Send_Type", "整改审批"));
-		reqParam.add(new BasicNameValuePair("url", "http://lzgfgs.com/voucher/mobile/flow/pass.html"));
+		reqParam.add(new BasicNameValuePair("url", Singleton.URL+"/mobile/flow/pass.html"));
 		reqParam.add(new BasicNameValuePair("first_data", "审核时间:"+time));
 		reqParam.add(new BasicNameValuePair("keyword1_data", neaten.getNeaten_item() + "整改维修"));
 		reqParam.add(new BasicNameValuePair("keyword2_data", result));

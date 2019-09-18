@@ -10,6 +10,8 @@ import java.util.Map;
 import org.activiti.engine.HistoryService;
 import org.activiti.engine.ProcessEngineConfiguration;
 import org.activiti.engine.runtime.ProcessInstance;
+import org.activiti.engine.task.Task;
+import org.activiti.engine.task.TaskQuery;
 import org.activiti.manage.context.ConnectSession;
 import org.activiti.manage.factory.FlowProduct;
 import org.activiti.manage.tools.MyTestUtil;
@@ -20,11 +22,10 @@ import com.rmi.server.entity.Deliveran;
 import com.rmi.server.entity.FlowData;
 import com.rmi.server.entity.Neaten;
 import com.rmi.server.entity.RoomInfoFlowIdEntity;
+import com.voucher.manage.singleton.Singleton;
 
-public class test extends FlowProduct{
-	
-	Session session=new ConnectSession().get();
-	
+public class neaten0 extends FlowProduct{
+
 	@Override
 	public ProcessInstance start(String userId,String processDefinitionKey, String variableData,
 			List imageDataList,ProcessEngineConfiguration processEngineFactory) throws Exception{
@@ -51,6 +52,7 @@ public class test extends FlowProduct{
 
 		address = jsonObject.getString("address");
 		neaten.setGUID(jsonObject.getString("guid"));
+		neaten.setNeaten_type(jsonObject.getInt("neaten_type"));
 		neaten.setNeaten_item(jsonObject.getString("neatenitem"));
 		neaten.setAddress(jsonObject.getString("address"));
 		neaten.setHappen_time(sdf.parse(jsonObject.getString("happenTime")));
@@ -63,6 +65,7 @@ public class test extends FlowProduct{
 		neaten.setType(jsonObject.getString("type"));
 		neaten.setArea(jsonObject.getFloat("area"));
 		neaten.setAmount(jsonObject.getFloat("amount"));
+		neaten.setAvailabeLength(jsonObject.getString("availabeLength"));
 		neaten.setWorkUnit(jsonObject.getString("workUnit"));
 		neaten.setCheckItemDate(jsonObject.getString("checkItemDate"));
 		neaten.setDate(date);
@@ -79,11 +82,11 @@ public class test extends FlowProduct{
 		flowData.setKeyword3_data(time2);
 		flowData.setKeyword4_data("正在申请");
 		flowData.setRemark_data("金额:" + jsonObject.getFloat("amount"));
-		flowData.setUrl("http://xx.lzgtzh.com/voucher/mobile/flow/myTask.html");
+		flowData.setUrl(Singleton.URL+"/mobile/flow/myTask.html");
 
 		Deliveran deliveran = new Deliveran();
 
-		deliveran.setContent("提交申请");
+		deliveran.setName("提交申请");
 		deliveran.setUserName(jsonObject.getString("username"));
 		deliveran.setDate(date);
 
@@ -120,40 +123,45 @@ public class test extends FlowProduct{
 		Map taskMap=processEngineFactory.getTaskService().getVariables(taskId);
 		
 		String userId=(String) taskMap.get("userId");
-		
+
 		String path;
 		
-		String processInstanceId=processEngineFactory.getTaskService().getTaskEvents(taskId).get(0).getProcessInstanceId();
+		FlowData flowData=(FlowData) processEngineFactory.getTaskService().getVariable(taskId, "flowData");
+		
+		TaskQuery taskQuery=processEngineFactory.getTaskService().createTaskQuery().taskId(taskId);
+	
+		System.out.println("taskQuery="+taskQuery.list().get(0).getProcessInstanceId());
+		
+		String processInstanceId=taskQuery.list().get(0).getProcessInstanceId();
 
+		Session session=new ConnectSession().get();
+		
 		List<RoomInfoFlowIdEntity> list=session.createQuery("from RoomInfoFlowIdEntity where processInstanceId=? ")
 				.setString(0, processInstanceId).list();
 		
 		RoomInfoFlowIdEntity roomInfoFlowIdEntity=list.get(0);
 		
-		int state=roomInfoFlowIdEntity.getState();
+		int result=roomInfoFlowIdEntity.getResult();
 		
-		if (state > 1) {
-			if (userId.equals(currentUserId)) {
-				path = "/testFlow/reTask";
-			} else {
-				path = "/testFlow/task";
-			}
+		System.out.println("result="+result);
+		
+
+		if (userId.equals(currentUserId)) {
+			path = "/mobile/flow/reTask";
 		} else {
-			if (userId.equals(currentUserId)) {
-				path = "/testFlow/acceptPut";
-			} else {
-				path = "/testFlow/acceptTask";
-			}
+			path = "/mobile/flow/task";
 		}
+
 		
 		return path;
 	}
 	
 	@Override
-	public void personalTask(String taskId,Integer input, String variableData, List imageDataList,ProcessEngineConfiguration processEngineFactory,HistoryService historyService) {
+	public void personalTask(String taskId,Integer input, String variableData,
+			List imageDataList,ProcessEngineConfiguration processEngineFactory,HistoryService historyService) {
 		// TODO Auto-generated method stub
 		Neaten neaten= (Neaten) processEngineFactory.getTaskService()// 与正在执行的任务管理相关的Service
-				.getVariable(taskId,"neaten");
+				.getVariable(taskId,"neaten0");
 		
 		FlowData flowData=(FlowData) processEngineFactory.getTaskService().getVariable(taskId, "flowData");
 		
@@ -176,143 +184,105 @@ public class test extends FlowProduct{
 		System.out.println("currentUserId=" + currentUserId);
 		System.out.println("userId=" + taskMap.get("userId"));
 
-		String processInstanceId=processEngineFactory.getTaskService().getTaskEvents(taskId).get(0).getProcessInstanceId();
+		TaskQuery taskQuery=processEngineFactory.getTaskService().createTaskQuery().taskId(taskId);
+		
+		Task task=taskQuery.list().get(0);
+		
+		String processInstanceId=task.getProcessInstanceId();
+		
+		Session session=new ConnectSession().get();
 		
 		List<RoomInfoFlowIdEntity> RoomInfoFlowIdList=session.createQuery("from RoomInfoFlowIdEntity where processInstanceId=? ")
 				.setString(0, processInstanceId).list();
 		
 		RoomInfoFlowIdEntity roomInfoFlowIdEntity=RoomInfoFlowIdList.get(0);
 		
-		int state=roomInfoFlowIdEntity.getState();
+		int result=roomInfoFlowIdEntity.getResult();
 		
-		if (state > 1) {
 			
-			if (!currentUserId.equals(taskMap.get("userId"))) {
+		if (!currentUserId.equals(taskMap.get("userId"))) {
 
-				flowData.setTitle("申请待审核通知");
-				flowData.setKeyword2_data(neaten.getNeaten_item() + "整改维修");
-				flowData.setKeyword3_data(sdf.format(neaten.getDate()));
-				flowData.setKeyword4_data("正在申请");
-				flowData.setRemark_data("金额:" + jsonObject.getFloat("amount"));
-				flowData.setUrl("http://xx.lzgtzh.com/voucher/mobile/1/flow/myTask.html");
+			flowData.setTitle("申请待审核通知");
+			flowData.setKeyword2_data(neaten.getNeaten_item() + "整改维修");
+			flowData.setKeyword3_data(sdf.format(neaten.getDate()));
+			flowData.setKeyword4_data("正在申请");
+			flowData.setRemark_data("金额:" + jsonObject.getFloat("amount"));
+			flowData.setUrl(Singleton.URL + "/mobile/flow/myTask.html");
 
-				List<Deliveran> list = flowData.getDeliverans();
+			List<Deliveran> list = flowData.getDeliverans();
 
-				Deliveran deliveran = new Deliveran();
+			Deliveran deliveran = new Deliveran();
 
-				System.out.println("content=" + jsonObject.getString("content"));
-				System.out.println("username=" + jsonObject.getString("username"));
+			deliveran.setName(task.getName());
+			deliveran.setContent(jsonObject.getString("content"));
+			deliveran.setUserName(jsonObject.getString("username"));
+			deliveran.setResult(input);
+			deliveran.setDate(date);
 
-				deliveran.setContent(jsonObject.getString("content"));
-				deliveran.setUserName(jsonObject.getString("username"));
-				deliveran.setDate(date);
-				MyTestUtil.print(deliveran);
-				list.add(deliveran);
+			list.add(deliveran);
 
-				flowData.setDeliverans(list);
+			flowData.setDeliverans(list);
 
-				variables.put("input", input);
+			variables.put("input", input);
 
-				variables.put("flowData", flowData);
-				MyTestUtil.print(flowData);
-				MyTestUtil.print(variables);
-				System.out.println("variablesuserid=" + taskMap.get("userId"));
+			variables.put("amount", jsonObject.getFloat("amount"));
 
-			} else {
+			variables.put("flowData", flowData);
+			MyTestUtil.print(flowData);
+			MyTestUtil.print(variables);
+			System.out.println("variablesuserid=" + taskMap.get("userId"));
 
-				neaten.setType(jsonObject.getString("type"));
-				neaten.setNeaten_instance(jsonObject.getString("neaten_instance"));
-				neaten.setPrincipal(jsonObject.getString("principal"));
-				neaten.setRemark(jsonObject.getString("remark"));
-				neaten.setArea(jsonObject.getFloat("area"));
-				neaten.setAmount(jsonObject.getFloat("amount"));
-				neaten.setWorkUnit(jsonObject.getString("workUnit"));
+		} else {
 
-				flowData.setTitle("申请待审核通知");
-				flowData.setKeyword2_data(neaten.getNeaten_item() + "整改维修");
-				flowData.setKeyword3_data(sdf.format(neaten.getDate()));
-				flowData.setKeyword4_data("正在申请");
-				flowData.setRemark_data("金额:" + jsonObject.getFloat("amount"));
-				flowData.setUrl("http://xx.lzgtzh.com/voucher/mobile/flow/myTask.html");
+			neaten.setType(jsonObject.getString("type"));
+			neaten.setNeaten_instance(jsonObject.getString("neaten_instance"));
+			neaten.setPrincipal(jsonObject.getString("principal"));
+			neaten.setRemark(jsonObject.getString("remark"));
+			neaten.setArea(jsonObject.getFloat("area"));
+			neaten.setAmount(jsonObject.getFloat("amount"));
+			neaten.setAvailabeLength(jsonObject.getString("availabeLength"));
+			neaten.setWorkUnit(jsonObject.getString("workUnit"));
 
-				variables.put("input", input);
+			flowData.setTitle("申请待审核通知");
+			flowData.setFirst_data(neaten.getAddress() + "维修申请");
+			flowData.setKeyword2_data(neaten.getNeaten_item() + "维修申请");
+			flowData.setKeyword3_data(sdf.format(neaten.getDate()));
+			flowData.setKeyword4_data("正在申请");
+			flowData.setRemark_data("金额:" + jsonObject.getFloat("amount"));
+			flowData.setUrl(Singleton.URL + "/mobile/flow/myTask.html");
 
-				variables.put("neaten", neaten);
+			List<Deliveran> list = flowData.getDeliverans();
 
-				variables.put("flowData", flowData);
+			Deliveran deliveran = new Deliveran();
 
-			}
-			
-		}else{
-			
-			if (!currentUserId.equals(taskMap.get("userId"))) {
+			deliveran.setName(task.getName());
+			deliveran.setUserName(jsonObject.getString("username"));
+			deliveran.setResult(3);
+			deliveran.setDate(date);
 
-				flowData.setTitle("申请待审核通知");
-				flowData.setKeyword2_data(neaten.getNeaten_item() + "维修验收申请");
-				flowData.setKeyword3_data(sdf.format(neaten.getDate()));
-				flowData.setKeyword4_data("正在申请");
-				flowData.setRemark_data("金额:" + jsonObject.getFloat("amountTotal"));
-				flowData.setUrl("http://xx.lzgtzh.com/voucher/mobile/1/flow/myTask.html");
+			list.add(deliveran);
 
-				List<Deliveran> list = flowData.getDeliverans();
+			flowData.setDeliverans(list);
 
-				Deliveran deliveran = new Deliveran();
+			variables.put("input", input);
 
-				System.out.println("content=" + jsonObject.getString("content"));
-				System.out.println("username=" + jsonObject.getString("username"));
+			variables.put("amount", jsonObject.getFloat("amount"));
 
-				deliveran.setContent(jsonObject.getString("content"));
-				deliveran.setUserName(jsonObject.getString("username"));
-				deliveran.setDate(date);
-				MyTestUtil.print(deliveran);
-				list.add(deliveran);
+			variables.put("neaten", neaten);
 
-				flowData.setDeliverans(list);
+			variables.put("flowData", flowData);
 
-				variables.put("input", input);
-
-				variables.put("flowData", flowData);
-				MyTestUtil.print(flowData);
-				MyTestUtil.print(variables);
-				System.out.println("variablesuserid=" + taskMap.get("userId"));
-
-			} else {
-
-				neaten.setType(jsonObject.getString("type"));
-				neaten.setNeaten_instance(jsonObject.getString("neaten_instance"));
-				neaten.setPrincipal(jsonObject.getString("principal"));
-				neaten.setRemark(jsonObject.getString("remark"));
-				neaten.setArea(jsonObject.getFloat("area"));
-				neaten.setAmount(jsonObject.getFloat("amount"));
-				neaten.setAmountTotal(jsonObject.getFloat("amountTotal"));
-				neaten.setAuditingAmount(jsonObject.getFloat("auditingAmount"));
-				neaten.setAvailabeLength(jsonObject.getString("availabeLength"));
-				neaten.setWorkUnit(jsonObject.getString("workUnit"));
-
-				flowData.setTitle("申请待审核通知");
-				flowData.setKeyword2_data(neaten.getNeaten_item() + "维修验收申请");
-				flowData.setKeyword3_data(sdf.format(neaten.getDate()));
-				flowData.setKeyword4_data("正在申请");
-				flowData.setRemark_data("金额:" + jsonObject.getFloat("amountTotal"));
-				flowData.setUrl("http://xx.lzgtzh.com/voucher/mobile/flow/myTask.html");
-
-				variables.put("input", input);
-
-				variables.put("neaten", neaten);
-
-				variables.put("flowData", flowData);
-
-			}
-			
 		}
+			
 		
 		if(input==2){
+			
 			
 			flowData.setTitle("审批退回提醒");
 			flowData.setKeyword2_data(sdf.format(neaten.getDate()));
 			flowData.setKeyword3_data(sdf.format(new Date()));
 			flowData.setRemark_data("请修改后重新提交审批");
-			flowData.setUrl("http://xx.lzgtzh.com/voucher/mobile/1/flow/myTask.html");
+			flowData.setUrl(Singleton.URL+"/mobile/flow/myTask.html");
 			
 			variables.put("flowData", flowData);
 			
@@ -321,13 +291,11 @@ public class test extends FlowProduct{
 		System.out.println("variables=");
 		
 		MyTestUtil.print(variables);
-	
+
 		processEngineFactory.getTaskService().setVariables(taskId, variables);
 		processEngineFactory.getTaskService()// 与正在执行的任务管理相关的Service
 				.complete(taskId, variables);
-			
+
 	}
-
-
-
+	
 }

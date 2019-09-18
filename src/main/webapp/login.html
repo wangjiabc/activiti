@@ -5,43 +5,7 @@
 	<title>Weixin后台管理</title>
 	<link rel='stylesheet' type='text/css' href='css/bootstrap.min.css'>
 	<link rel="shortcut icon" href="img/icon.png">
-	<script type='text/javascript' src="js/jquery.js"></script>
-	<script type='text/javascript' src="js/bootstrap.min.js"></script>
-
-	<script type="text/javascript">
 	
-		function toLogin(){
-			var phone=document.getElementById("phone").value;
-			var password=document.getElementById("password").value;
-			
-			if ((phone==null||phone=="")||(password==null||password=="")) {
-				$("#message").html("账号或者密码为空，请检查后输入");
-				return;
-			};
-			
-			$.post("../../activiti/seller/toLogin.do",
-				{campusAdmin:phone,password:password},
-				function(text){
-					console.log(text);
-					var json=text;
-					if (json.status=="success") {
-
-								//跳转到主页
-								top.location.href="admin.html?backurl="+window.location.href;
-
-
-						}else{
-                            $("#message").html("对不起，你没有登陆权限！");
-						}
-
-				});
-		}
-		
-		
-	 function toRegister(){
-		 top.location.href="register.html";
-	 }	
-	</script>
 	<style type="text/css">
 		.message{
 			color: red
@@ -87,25 +51,66 @@
 			</div>
 		</div>
 	</div>
+	
+	<script type="text/javascript" src="mobile/singleton.js"></script>
+	<script type='text/javascript' src="js/jquery.js"></script>
+	<script type='text/javascript' src="js/bootstrap.min.js"></script>
+	
 	<script>
-	  $("#dropdownMenu1").next().children().children().click(function(){
-		$('#dropdownMenu1').text($(this).text());
-	  });
+	  	$("#dropdownMenu1").next().children().children().click(function(){
+			$('#dropdownMenu1').text($(this).text());
+	  	});
 	
 		$("#phone").focus(function(){
 			$("#message").html("");
 		});
-
+	
 		$("#password").focus(function(){
 			$("#message").html("");
 		});
-
+	
 		$('#password').keypress(function(event){
 			if(event.keyCode==13){
 				toLogin();
 			}
 		});
 		
+	</script>
+	
+	<script type="text/javascript">
+	
+		function toLogin(){
+			var phone=document.getElementById("phone").value;
+			var password=document.getElementById("password").value;
+			
+			if ((phone==null||phone=="")||(password==null||password=="")) {
+				$("#message").html("账号或者密码为空，请检查后输入");
+				return;
+			};
+			
+			var url = progress +"/seller/toLogin.do"
+			$.post(url,
+				{campusAdmin:phone,password:password},
+				function(text){
+					console.log(text);
+					var json=text;
+					if (json.status=="success") {
+
+								//跳转到主页
+								top.location.href="admin.html?backurl="+window.location.href;
+
+
+						}else{
+                            $("#message").html("对不起，你没有登陆权限！");
+						}
+
+				});
+		}
+		
+		
+	 function toRegister(){
+		 top.location.href="register.html";
+	 }	
 	</script>
 </body>
 </html>

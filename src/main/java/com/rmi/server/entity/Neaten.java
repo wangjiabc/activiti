@@ -10,6 +10,8 @@ public class Neaten implements Serializable{
 	
 	private static final long serialVersionUID = 1L;
 	
+	private Integer neaten_type;
+	
 	private Integer id;
 
 	private String GUID;
@@ -328,6 +330,14 @@ public class Neaten implements Serializable{
 
 	public void setApplicationUser(String applicationUser) {
 		this.applicationUser = applicationUser;
+	}
+
+	public Integer getNeaten_type() {
+		return neaten_type;
+	}
+
+	public void setNeaten_type(Integer neaten_type) {
+		this.neaten_type = neaten_type;
 	}
 
 

@@ -93,7 +93,6 @@ public class ActivitiController {
     @Autowired
     ProcessEngineConfiguration processEngineFactory;
     
-    
     @Autowired
     ReDeploymentMapper reDeploymentMapper;
     

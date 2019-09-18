@@ -9,13 +9,16 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-<script type="text/javascript" src="../js/jquery.js"></script>
+
 <title>message</title>
 </head>
 <body>
   <div id="i"></div>
   <div><span>commit total=</span><span id="commit" value="0"></span></div>
   <div><span>rollback total=</span><span id="rollback" value="0"></span></div>
+  
+  <script type="text/javascript" src="../js/jquery.js"></script>
+  <script type="text/javascript" src="../singleton.js"></script>
   <script type="text/javascript">
   var i=0;
   setTimeout(function(){
@@ -24,8 +27,8 @@
   
   
  
-  
-  $.get("/activiti/test/affair1.do",
+  var url1 = progress +"/test/affair1.do"
+  $.get(url1,
 	  function(data){
 	        
 	     if(data==1){
@@ -47,7 +50,9 @@
 	     
 	});
   
-  $.get("/activiti/test/affair2.do",
+  
+  var url2 = progress +"/test/affair2.do"
+  $.get(url2,
 		  function(data){
 		        
 		     if(data==1){
