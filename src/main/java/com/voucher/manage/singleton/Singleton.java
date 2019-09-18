@@ -16,10 +16,10 @@ public class Singleton {
 //	public static final String URL = "http://lyjt.lzgtzh.com";
 	
 	//智汇公司测试
-	public static final String URL = "http://test.lzgtzh.com/voucher";
+	//public static final String URL = "http://test.lzgtzh.com/voucher";
 	
 	//古蔺国资
 //	public static final String URL = "http://www.gulinguozi.com/voucher";
 	
-//	public static final String URL = "http://lzxlzc.com/voucher";
+	public static final String URL = "http://127.0.0.1/voucher";
 }
